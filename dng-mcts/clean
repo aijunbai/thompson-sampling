@@ -1,0 +1,7 @@
+#!/bin/bash
+
+for i in taxi ctp3 sailing race random-mdps puzzle rect tree wet; do
+    cd $i
+    make clean
+    cd ..
+done

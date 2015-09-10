@@ -1,0 +1,23 @@
+Examples for instance small-graphs/test00_10.graph:
+
+Use depth=10 (as there are 10 steps to go to the end of MDP), parameter p=0.5,
+and w/ 10 expansions per iteration. The width is set to 400.
+
+To run ctp3 for 100 trials, using AOT with the min-min heuristic and breaking ties
+in selection of best action randomly, do
+
+  ./ctp3 -t 100 small-graphs/test00_10.graph min-min aot/heuristic,random-ties 400 10 .5 10
+
+To run ctp3 for 100 trials, using AOT with the zero heuristic and breaking ties
+in selection of best action randomly, do
+
+  ./ctp3 -t 100 small-graphs/test00_10.graph zero aot/heuristic,random-ties 400 10 .5 10
+
+To run ctp3 for 100 trials, using AOT with optimistic base and breaking ties in selection
+of best action randomly, do
+
+  ./ctp3 -t 100 small-graphs/test00_10.graph optimistic aot/random-ties 400 10 .5 10
+
+To see all options for algorithms, see ../engine/dispatcher.h
+To see all options for base policies and heuristics, see main.cc
+

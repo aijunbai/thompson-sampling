@@ -1,0 +1,24 @@
+#!/bin/bash
+
+CPUS=`cat /proc/cpuinfo | grep processor | wc -l`
+TASKS=(ctp3 sailing race random-mdps puzzle rect tree wet taxi)
+
+echo $CPUS
+
+build() {
+    local ID="$1"
+
+    for i in `seq 1 ${#TASKS[@]}`; do
+        local task=`expr $i - 1`
+        if [ `expr $task % $CPUS` -eq $ID ]; then
+            echo building ${TASKS[$task]} @ $ID...
+            cd ${TASKS[$task]}
+            make
+            cd ..
+        fi
+    done
+}
+
+for i in `seq 1 $CPUS`; do
+    build `expr $i - 1` &
+done
