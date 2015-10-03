@@ -1,4 +1,5 @@
 #include "network.h"
+#include "distribution.h"
 #include "utils.h"
 
 using namespace std;
@@ -99,9 +100,9 @@ bool NETWORK::Step(STATE& state, int action,
     for (int i = 0; i < NumMachines; i++)
     {
         if (!neighbourFailure[i])
-            nstate.Machines[i] = !Bernoulli(FailureProb1);
+            nstate.Machines[i] = !SimpleRNG::ins().Bernoulli(FailureProb1);
         else
-            nstate.Machines[i] = !Bernoulli(FailureProb2);
+            nstate.Machines[i] = !SimpleRNG::ins().Bernoulli(FailureProb2);
     }
          
     for (int i = 0; i < NumMachines; i++)
@@ -124,12 +125,12 @@ bool NETWORK::Step(STATE& state, int action,
         {
             reward -= 2.5;
             nstate.Machines[machine] = true;
-            observation = Bernoulli(ObsProb);
+            observation = SimpleRNG::ins().Bernoulli(ObsProb);
         }
         else // ping
         {
             reward -= 0.1;
-            if (Bernoulli(ObsProb))
+            if (SimpleRNG::ins().Bernoulli(ObsProb))
                 observation = nstate.Machines[machine];
             else
                 observation = !nstate.Machines[machine];

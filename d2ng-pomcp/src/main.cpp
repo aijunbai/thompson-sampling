@@ -6,13 +6,12 @@
 #include "tag.h"
 #include "experiment.h"
 #include "statistic.h"
+#include "utils.h"
+#include "distribution.h"
 #include <boost/program_options.hpp>
-#include <boost/math/distributions.hpp>
 
 using namespace std;
 using namespace boost::program_options;
-
-boost::mt19937 RNG;
 
 double NormalGammaInfo::ALPHA = 0.01;
 double NormalGammaInfo::BETA = 10.0;
@@ -108,7 +107,7 @@ int main(int argc, char* argv[])
     }
 
     if (seeding) {
-    	UTILS::RandomSeed(getpid());
+      SimpleRNG::ins().RandomSeed(getpid());
     }
 
     SIMULATOR* real = 0; //真实环境

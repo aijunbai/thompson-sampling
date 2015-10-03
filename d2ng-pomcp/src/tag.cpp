@@ -1,4 +1,5 @@
 #include "tag.h"
+#include "distribution.h"
 
 using namespace std;
 using namespace UTILS;
@@ -33,10 +34,10 @@ STATE* TAG::CreateStartState() const
 {
     TAG_STATE* tagstate = MemoryPool.Allocate();
     tagstate->NumAlive = NumOpponents;
-    tagstate->AgentPos = GetCoord(Random(NumCells));
+    tagstate->AgentPos = GetCoord(SimpleRNG::ins().Random(NumCells));
     tagstate->OpponentPos.clear();
     for (int i = 0; i < NumOpponents; ++i)
-        tagstate->OpponentPos.push_back(GetCoord(Random(NumCells)));
+        tagstate->OpponentPos.push_back(GetCoord(SimpleRNG::ins().Random(NumCells)));
     return tagstate;
 }
 
@@ -150,7 +151,7 @@ inline bool TAG::IsCorner(const COORD& coord) const
 
 inline COORD TAG::GetRandomCorner() const
 {
-    int c = Random(6);
+    int c = SimpleRNG::ins().Random(6);
     switch(c)
     {
         case 0: return COORD(0, 0);
@@ -188,9 +189,9 @@ void TAG::MoveOpponent(TAG_STATE& tagstate, int opp) const
         actions.push_back(COORD::E_WEST);
     
     assert(!actions.empty());
-    if (Bernoulli(0.8))
+    if (SimpleRNG::ins().Bernoulli(0.8))
     {
-        int d = actions[Random(actions.size())];
+        int d = actions[SimpleRNG::ins().Random(actions.size())];
         if (Inside(opponent + coord::Compass[d]))
             opponent = opponent + coord::Compass[d];
     }
@@ -201,10 +202,10 @@ bool TAG::LocalMove(STATE& state, const HISTORY& history,
 {
     TAG_STATE& tagstate = safe_cast<TAG_STATE&>(state);
 
-    int opp = Random(NumOpponents);
+    int opp = SimpleRNG::ins().Random(NumOpponents);
     if (!IsAlive(tagstate, opp))
         return false;
-    tagstate.OpponentPos[opp] = GetCoord(Random(NumCells));
+    tagstate.OpponentPos[opp] = GetCoord(SimpleRNG::ins().Random(NumCells));
 
     int realObs = history.Back().Observation;
     if (realObs < NumCells && realObs != GetIndex(tagstate.AgentPos))

@@ -4,6 +4,7 @@
 #include <vector>
 #include <cstdlib>
 #include "statistic.h"
+#include "distribution.h"
 
 class STATE;
 class SIMULATOR;
@@ -30,8 +31,8 @@ public:
 
     bool Empty() const { return Samples.empty(); }
     int GetNumSamples() const { return Samples.size(); }
-    const STATE* GetSample(int index) const { return Samples[index]; }
-    const STATE* GetSample() const { return GetSample(rand() % Samples.size()); }
+    const STATE* GetSample(int index) const { return Samples.at(index); }
+    const STATE* GetSample() const { return GetSample(SimpleRNG::ins().Random(Samples.size())); }
     
     static STATISTIC SAMPLES_STAT;
 

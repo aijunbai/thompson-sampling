@@ -1,5 +1,6 @@
 #include "rocksample.h"
 #include "utils.h"
+#include "distribution.h"
 #include <bitset>
 
 using namespace std;
@@ -32,13 +33,13 @@ void ROCKSAMPLE::InitGeneral()
 {
 	vector<COORD> rocks; //保持模拟器和真实环境一致性
 
-    RandomSeed(0);
+  SimpleRNG::ins().RandomSeed(0);
 
     for (int i = 0; i < NumRocks; ++i) {
         COORD pos;
         do
         {
-            pos = COORD(Random(Size), Random(Size));
+            pos = COORD(SimpleRNG::ins().Random(Size), SimpleRNG::ins().Random(Size));
         }
         while (Contains(rocks, pos));
         rocks.push_back(pos);
@@ -117,7 +118,7 @@ STATE* ROCKSAMPLE::CreateStartState() const
         RS_ENTRY entry;
 
         entry.Collected = false;
-        entry.Valuable = Bernoulli(0.5); //随机决定（50/50）
+        entry.Valuable = SimpleRNG::ins().Bernoulli(0.5); //随机决定（50/50）
         entry.Count = 0;
         entry.Measured = 0;
         entry.ProbValuable = 0.5;
@@ -237,7 +238,7 @@ bool ROCKSAMPLE::LocalMove(STATE& state, const HISTORY& history,
 {
 	if (NumRocks) {
 		ROCKSAMPLE_STATE& rockstate = safe_cast<ROCKSAMPLE_STATE&>(state);
-		int rock = Random(NumRocks);
+		int rock = SimpleRNG::ins().Random(NumRocks);
 		rockstate.Rocks[rock].Valuable = !rockstate.Rocks[rock].Valuable;
 
 		if (history.Back().Action > E_SAMPLE) // check rock
@@ -415,7 +416,7 @@ int ROCKSAMPLE::GetObservation(const ROCKSAMPLE_STATE& rockstate, int rock) cons
     double distance = coord::EuclideanDistance(rockstate.AgentPos, RockPos[rock]);
     double efficiency = (1 + pow(2, -distance / HalfEfficiencyDistance)) * 0.5; //[0.5, 1.0]
 
-    if (Bernoulli(efficiency))
+    if (SimpleRNG::ins().Bernoulli(efficiency))
         return rockstate.Rocks[rock].Valuable ? E_GOOD : E_BAD;
     else
         return rockstate.Rocks[rock].Valuable ? E_BAD : E_GOOD;
@@ -559,7 +560,7 @@ bool FieldVisionRockSample::LocalMove(STATE& state, const HISTORY& /*history*/,
 {
 	if (NumRocks) {
 		ROCKSAMPLE_STATE& rockstate = safe_cast<ROCKSAMPLE_STATE&>(state);
-		int rock = Random(NumRocks);
+		int rock = SimpleRNG::ins().Random(NumRocks);
 
 		if (!rockstate.Rocks[rock].Collected) {
 			rockstate.Rocks[rock].Valuable = !rockstate.Rocks[rock].Valuable;

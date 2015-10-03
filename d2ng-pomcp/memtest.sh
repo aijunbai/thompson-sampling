@@ -12,7 +12,7 @@ if [ ! -z $2 ]; then
     NUM=$2
 fi
 
-valgrind -v --leak-check=full ../d2ng-pomcp --size $SIZE --number $NUM --problem fieldvisionrocksample \
+valgrind -v --leak-check=full ./d2ng-pomcp --size $SIZE --number $NUM --problem fieldvisionrocksample \
                                             --verbose 1 \
                                             --reusedepth 2 \
                                             --reusetree 1 \

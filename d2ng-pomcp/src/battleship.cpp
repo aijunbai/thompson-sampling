@@ -1,6 +1,7 @@
 #include "battleship.h"
 #include "beliefstate.h"
 #include "utils.h"
+#include "distribution.h"
 #include <math.h>
 #include <iomanip>
 
@@ -73,8 +74,8 @@ STATE* BATTLESHIP::CreateStartState() const
             SHIP ship;
             do
             {
-                ship.Direction = Random(4);
-                ship.Position = COORD(Random(XSize), Random(YSize));
+                ship.Direction = SimpleRNG::ins().Random(4);
+                ship.Position = COORD(SimpleRNG::ins().Random(XSize), SimpleRNG::ins().Random(YSize));
                 ship.Length = length;
             }
             while (Collision(*bsstate, ship));
@@ -147,7 +148,7 @@ bool BATTLESHIP::LocalMove(STATE& state, const HISTORY& history,
     bool refreshDiagonals = history.Size() &&
         bsstate.Cells(history.Back().Action).Occupied != history.Back().Observation;
 
-    int mode = Random(3);
+    int mode = SimpleRNG::ins().Random(3);
     bool success = false;
     switch (mode)
     {
@@ -190,13 +191,13 @@ bool BATTLESHIP::LocalMove(STATE& state, const HISTORY& history,
 bool BATTLESHIP::MoveShips(BATTLESHIP_STATE& bsstate) const
 {
     // Number of ships to move
-    int numMoves = Random(1, 4);
+    int numMoves = SimpleRNG::ins().Random(1, 4);
     static vector<int> shipIndices;
     shipIndices.clear();
 
     for (int move = 0; move < numMoves; ++move)
     {
-        int shipIndex = Random(bsstate.Ships.size());
+        int shipIndex = SimpleRNG::ins().Random(bsstate.Ships.size());
         if (Contains(shipIndices, shipIndex))
             return false;
         shipIndices.push_back(shipIndex);
@@ -206,8 +207,8 @@ bool BATTLESHIP::MoveShips(BATTLESHIP_STATE& bsstate) const
     for (int move = 0; move < numMoves; ++move)
     {
         SHIP& ship = bsstate.Ships[shipIndices[move]];
-        ship.Direction = Random(4);
-        ship.Position = COORD(Random(XSize), Random(YSize));
+        ship.Direction = SimpleRNG::ins().Random(4);
+        ship.Position = COORD(SimpleRNG::ins().Random(XSize), SimpleRNG::ins().Random(YSize));
         if (Collision(bsstate, ship))
             return false;
         MarkShip(bsstate, ship);
@@ -218,8 +219,8 @@ bool BATTLESHIP::MoveShips(BATTLESHIP_STATE& bsstate) const
 
 bool BATTLESHIP::SwitchTwoShips(BATTLESHIP_STATE& bsstate) const
 {
-    int longShipIndex = Random(bsstate.Ships.size());
-    int shortShipIndex = Random(bsstate.Ships.size());
+    int longShipIndex = SimpleRNG::ins().Random(bsstate.Ships.size());
+    int shortShipIndex = SimpleRNG::ins().Random(bsstate.Ships.size());
     SHIP& longShip = bsstate.Ships[longShipIndex];
     SHIP& shortShip = bsstate.Ships[shortShipIndex];
 
@@ -227,8 +228,8 @@ bool BATTLESHIP::SwitchTwoShips(BATTLESHIP_STATE& bsstate) const
     if (sizeDiff <= 0)
         return false;
 
-    int longOffset = Random(0, sizeDiff + 1);
-    int shortOffset = Random(0, sizeDiff + 1);
+    int longOffset = SimpleRNG::ins().Random(0, sizeDiff + 1);
+    int shortOffset = SimpleRNG::ins().Random(0, sizeDiff + 1);
 
     SHIP oldShortShip = shortShip;
     SHIP oldLongShip = longShip;
@@ -254,9 +255,9 @@ bool BATTLESHIP::SwitchTwoShips(BATTLESHIP_STATE& bsstate) const
 
 bool BATTLESHIP::SwitchThreeShips(BATTLESHIP_STATE& bsstate) const
 {
-    int longShipIndex = Random(bsstate.Ships.size());
-    int shortShipIndex1 = Random(bsstate.Ships.size());
-    int shortShipIndex2 = Random(bsstate.Ships.size());
+    int longShipIndex = SimpleRNG::ins().Random(bsstate.Ships.size());
+    int shortShipIndex1 = SimpleRNG::ins().Random(bsstate.Ships.size());
+    int shortShipIndex2 = SimpleRNG::ins().Random(bsstate.Ships.size());
     SHIP& longShip = bsstate.Ships[longShipIndex];
     SHIP& shortShip1 = bsstate.Ships[shortShipIndex1];
     SHIP& shortShip2 = bsstate.Ships[shortShipIndex2];
@@ -265,9 +266,9 @@ bool BATTLESHIP::SwitchThreeShips(BATTLESHIP_STATE& bsstate) const
     if (sizeDiff <= 0 || shortShipIndex1 == shortShipIndex2)
         return false;
 
-    int longOffset = Random(0, longShip.Length - shortShip1.Length + 1);
-    int shortOffset1 = Random(0, sizeDiff);
-    int shortOffset2 = Random(shortOffset1 + 2, longShip.Length - shortShip2.Length + 1);
+    int longOffset = SimpleRNG::ins().Random(0, longShip.Length - shortShip1.Length + 1);
+    int shortOffset1 = SimpleRNG::ins().Random(0, sizeDiff);
+    int shortOffset2 = SimpleRNG::ins().Random(shortOffset1 + 2, longShip.Length - shortShip2.Length + 1);
 
     SHIP oldShortShip1 = shortShip1;
     SHIP oldShortShip2 = shortShip2;

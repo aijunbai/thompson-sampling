@@ -1,4 +1,5 @@
 #include "pocman.h"
+#include "distribution.h"
 #include "utils.h"
 
 using namespace std;
@@ -262,13 +263,13 @@ bool POCMAN::LocalMove(STATE& state, const HISTORY& history,
 {
     POCMAN_STATE& pocstate = safe_cast<POCMAN_STATE&>(state);
     
-    int numGhosts = Random(1, 3); // Change 1 or 2 ghosts at a time
+    int numGhosts = SimpleRNG::ins().Random(1, 3); // Change 1 or 2 ghosts at a time
     for (int i = 0; i < numGhosts; ++i)
     {
-        int g = Random(NumGhosts);
+        int g = SimpleRNG::ins().Random(NumGhosts);
         pocstate.GhostPos[g] = COORD(
-            Random(Maze.GetXSize()),
-            Random(Maze.GetYSize()));
+            SimpleRNG::ins().Random(Maze.GetXSize()),
+            SimpleRNG::ins().Random(Maze.GetYSize()));
         if (!Passable(pocstate.GhostPos[g]) 
             || pocstate.GhostPos[g] == pocstate.PocmanPos)
             return false;
@@ -283,7 +284,7 @@ bool POCMAN::LocalMove(STATE& state, const HISTORY& history,
             if (smellPos != COORD(0, 0) &&
                 Maze.Inside(pos) && 
                 CheckFlag(Maze(pos), E_SEED))
-                pocstate.Food[Maze.Index(pos)] = Bernoulli(FoodProb * 0.5);
+                pocstate.Food[Maze.Index(pos)] = SimpleRNG::ins().Bernoulli(FoodProb * 0.5);
         }
     }
 
@@ -312,7 +313,7 @@ void POCMAN::MoveGhost(POCMAN_STATE& pocstate, int g) const
 
 void POCMAN::MoveGhostAggressive(POCMAN_STATE& pocstate, int g) const
 {
-    if (!Bernoulli(ChaseProb))
+    if (!SimpleRNG::ins().Bernoulli(ChaseProb))
     {
         MoveGhostRandom(pocstate, g);
         return;
@@ -340,7 +341,7 @@ void POCMAN::MoveGhostAggressive(POCMAN_STATE& pocstate, int g) const
 
 void POCMAN::MoveGhostDefensive(POCMAN_STATE& pocstate, int g) const
 {
-    if (Bernoulli(DefensiveSlip) && pocstate.GhostDir[g] >= 0)
+    if (SimpleRNG::ins().Bernoulli(DefensiveSlip) && pocstate.GhostDir[g] >= 0)
     {
         pocstate.GhostDir[g] = -1;
         return;
@@ -375,7 +376,7 @@ void POCMAN::MoveGhostRandom(POCMAN_STATE& pocstate, int g) const
 //    int tempc = 0;
     do
     {
-        dir = Random(4);
+        dir = SimpleRNG::ins().Random(4);
         newpos = NextPos(pocstate.GhostPos[g], dir);
     }
     while (coord::Opposite(dir) == pocstate.GhostDir[g] || !newpos.Valid());
@@ -402,7 +403,7 @@ void POCMAN::NewLevel(POCMAN_STATE& pocstate) const
             int pocIndex = Maze.Index(x, y);
             if (CheckFlag(Maze(x, y), E_SEED)
                 && (CheckFlag(Maze(x, y), E_POWER)
-                    || Bernoulli(FoodProb)))
+                    || SimpleRNG::ins().Bernoulli(FoodProb)))
             {
                 pocstate.Food[pocIndex] = 1;
                 pocstate.NumFood++;

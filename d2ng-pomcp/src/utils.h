@@ -8,12 +8,8 @@
 #include "coord.h"
 #include "memorypool.h"
 #include <algorithm>
-#include <boost/random.hpp>
-#include <boost/math/distributions.hpp>
 #include <iostream>
 #include <map>
-
-extern boost::mt19937 RNG;
 
 #define LargeInteger 1000000
 #define Infinity 1e+10
@@ -41,34 +37,6 @@ namespace UTILS
 inline int Sign(int x)
 {
     return (x > 0) - (x < 0);
-}
-
-inline int Random(int max)
-{
-    return rand() % max;
-}
-
-inline int Random(int min, int max)
-{
-    return rand() % (max - min) + min;
-}
-
-inline double RandomDouble(double min, double max)
-{
-    return (double) rand() / RAND_MAX * (max - min) + min;
-}
-
-inline void RandomSeed(int seed)
-{
-    srand(seed);
-    srand48(seed);
-
-	RNG.seed(seed);
-}
-
-inline bool Bernoulli(double p)
-{
-    return rand() < p * RAND_MAX;
 }
 
 inline bool Near(double x, double y, double tol)

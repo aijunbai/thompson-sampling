@@ -5,17 +5,13 @@
 #include <iostream>
 #include <fstream>
 #include <boost/unordered_map.hpp>
-#include <boost/random.hpp>
-#include <boost/random/normal_distribution.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/program_options.hpp>
-#include <boost/math/distributions.hpp>
+#include "distribution.h"
 
 #define MULTI_ROLLOUTS 1 //multi rollouts 个数，默认为 1
 #define MIXTURE_NORMAL 1
 #define SAMPLE_REWARD  1
-
-extern boost::mt19937 RNG;
 
 template <typename Generator>
 inline void DumpDistribution(Generator gen, int samples, const char *file_name, bool append) {
@@ -264,7 +260,7 @@ public:
 	}
 
 	double operator()() {
-		return mLow + drand48() * (mHigh - mLow);
+    return SimpleRNG::ins().GetUniform(mLow, mHigh);
 	}
 
 	const double mLow;
@@ -278,9 +274,9 @@ public:
 	}
 
 	double operator()() {
-		const double t = boost::gamma_distribution<>(Alpha, 1.0 / Beta)(RNG);
+    const double t = SimpleRNG::ins().GetGamma(Alpha, 1.0 / Beta);
 		const double p = std::max(Lambda * t, 1.0e-6);
-		const double m = boost::normal_distribution<>(Mu, sqrt(1.0 / p))(RNG);
+		const double m = SimpleRNG::ins().GetNormal(Mu, sqrt(1.0 / p));
 
 		return m;
 	}
@@ -325,7 +321,7 @@ public:
     		Alpha += 1.0;
     	}
     	else {
-    		double trial = drand48(); //boost::uniform_real<>(0.0, 1.0)(RNG);
+    		double trial = SimpleRNG::ins().GetUniform();
 
     		if (trial < prob) { //sucess
     			Alpha += 1.0;
@@ -342,8 +338,8 @@ public:
 
 	double ThompsonSampling(bool sampling = true) const { //Two Step: 采样一个模型参数，并计算出该模型参数对应的期望收益
 		if (sampling) {
-			double x = boost::gamma_distribution<>(Alpha)(RNG);
-			double y = boost::gamma_distribution<>(Beta)(RNG);
+			double x = SimpleRNG::ins().GetGamma(Alpha);
+			double y = SimpleRNG::ins().GetGamma(Beta);
 
 			return x / (x + y) * (MAX - MIN) + MIN;
 		}
@@ -517,7 +513,7 @@ public:
 		double sum = 0.0;
         for(typename H::iterator it = Alpha.begin(); it != Alpha.end(); ++it ) {
         	outcomes_.push_back(std::make_pair(it->first, 0));
-        	outcomes_.back().second = sampling? boost::gamma_distribution<>(it->second)(RNG): it->second;
+        	outcomes_.back().second = sampling? SimpleRNG::ins().GetGamma(it->second): it->second;
         	sum += outcomes_.back().second;
         }
 

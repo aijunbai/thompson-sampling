@@ -1,5 +1,6 @@
 #include "testsimulator.h"
 #include "utils.h"
+#include "distribution.h"
 
 using namespace UTILS;
 
@@ -31,7 +32,7 @@ bool TEST_SIMULATOR::Step(STATE& state, int action,
     else
         reward = 0.0;
 
-    observation = Random(0, GetNumObservations());
+    observation = SimpleRNG::ins().Random(0, GetNumObservations());
     tstate.Depth++;
     return false;
 }

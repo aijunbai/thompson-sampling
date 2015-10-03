@@ -21,7 +21,6 @@ public:
         bool UseParticleFilter;
         int NumTransforms;
         int MaxAttempts;
-/*        int ExpandCount;*/
         double RaveDiscount;
         double RaveConstant;
         bool ReuseTree;

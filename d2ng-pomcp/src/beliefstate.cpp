@@ -1,6 +1,7 @@
 #include "beliefstate.h"
 #include "simulator.h"
 #include "utils.h"
+#include "distribution.h"
 
 using namespace UTILS;
 
@@ -25,7 +26,7 @@ void BELIEF_STATE::Free(const SIMULATOR& simulator)
 
 STATE* BELIEF_STATE::CreateSample(const SIMULATOR& simulator) const
 {
-    int index = Random(Samples.size());
+    int index = SimpleRNG::ins().Random(Samples.size());
     return simulator.Copy(*Samples[index]);
 }
 

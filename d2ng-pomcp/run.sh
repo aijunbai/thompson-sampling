@@ -10,8 +10,8 @@ VERBOSE=2
 USEPFILTER=0
 REUSETREE=0
 REUSEDEPTH=2
-MINPOWER2=10
-MAXPOWER2=10
+MINPOWER2=12
+MAXPOWER2=12
 SEEDING=0
 TIMEOUT=3600
 TIMEOUTPERACTION=-1
@@ -50,7 +50,7 @@ run() {
 
 
 make -j `expr $CPUS + 1`
-run ../d2ng-pomcp --outputfile $OUTPUT \
+run ./d2ng-pomcp --outputfile $OUTPUT \
             --problem $PROBLEM \
             --size $SIZE \
             --number $NUM \

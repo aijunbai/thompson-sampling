@@ -1,4 +1,5 @@
 #include "simulator.h"
+#include "distribution.h"
 
 using namespace std;
 using namespace UTILS;
@@ -70,7 +71,7 @@ int SIMULATOR::SelectRandom(const STATE& state, const HISTORY& history,
         actions.clear();
         GeneratePreferred(state, history, actions, status);
         if (!actions.empty())
-            return actions[Random(actions.size())];
+            return actions[SimpleRNG::ins().Random(actions.size())];
     }
         
     if (Knowledge.RolloutLevel >= KNOWLEDGE::LEGAL)
@@ -78,10 +79,10 @@ int SIMULATOR::SelectRandom(const STATE& state, const HISTORY& history,
         actions.clear();
         GenerateLegal(state, /*history,*/ actions, status);
         if (!actions.empty())
-            return actions[Random(actions.size())];
+            return actions[SimpleRNG::ins().Random(actions.size())];
     }
 
-    return Random(NumActions);
+    return SimpleRNG::ins().Random(NumActions);
 }
 
 void SIMULATOR::Prior(const STATE* state, const HISTORY& history,
