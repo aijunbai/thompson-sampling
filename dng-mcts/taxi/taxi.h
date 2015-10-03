@@ -17,8 +17,7 @@ class problem_t : public Problem::problem_t<state_t> {
     problem_t(int size):
     	Problem::problem_t<state_t>(DISCOUNT)
     {
-      TaxiEnv::SIZE = size;
-      TaxiEnv::model = new TaxiEnv::EnvModel();
+      TaxiEnv::new_model(size);
     }
     virtual ~problem_t() {
     }

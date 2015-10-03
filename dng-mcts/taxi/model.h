@@ -48,6 +48,11 @@ class TaxiEnv {
 public:
 	static int SIZE;
 
+	static void new_model(int size) {
+    SIZE = size;
+    delete model;
+    model = new TaxiEnv::EnvModel();
+	}
 public:
 	struct Position {
 		int x;
