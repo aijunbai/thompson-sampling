@@ -1,6 +1,3 @@
-//D2NG-POMCP algorithm
-//Created by Aijun Bai, aijunbai@gmail.com
-
 #ifndef MCTS_H
 #define MCTS_H
 

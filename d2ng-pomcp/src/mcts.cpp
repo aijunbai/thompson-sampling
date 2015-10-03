@@ -1,6 +1,3 @@
-//D2NG-POMCP algorithm
-//Created by Aijun Bai, aijunbai@gmail.com
-
 #include "mcts.h"
 #include "testsimulator.h"
 #include "statistic.h"
