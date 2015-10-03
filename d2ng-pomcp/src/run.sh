@@ -50,7 +50,7 @@ run() {
 
 
 make -j `expr $CPUS + 1`
-run ./pomcp --outputfile $OUTPUT \
+run ../d2ng-pomcp --outputfile $OUTPUT \
             --problem $PROBLEM \
             --size $SIZE \
             --number $NUM \

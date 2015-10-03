@@ -1,3 +1,3 @@
 #!/bin/bash
 
-killall pomcp
+killall d2ng-pomcp
