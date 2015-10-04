@@ -13,11 +13,11 @@ class VNODE;
 class STATE : public MEMORY_OBJECT
 {
 public:
-	virtual ~STATE() {
+    virtual ~STATE() {
 
-	}
+    }
 
-	virtual size_t hash() const = 0;
+    virtual size_t hash() const = 0;
 };
 
 class SIMULATOR
@@ -35,12 +35,12 @@ public:
         };
 
         KNOWLEDGE();
-        
+
         int TreeLevel; //标记使用何种方式初始化为 vnode
         int RolloutLevel; //标记使用何种方式 rollout
         int SmartTreeCount;
         double SmartTreeValue;
-        
+
         int Level(int phase) const
         {
             assert(phase < STATUS::NUM_PHASES);
@@ -54,14 +54,14 @@ public:
     struct STATUS
     {
         STATUS();
-        
+
         enum
         {
             TREE,
             ROLLOUT,
             NUM_PHASES
         };
-        
+
         enum
         {
             CONSISTENT,
@@ -69,13 +69,13 @@ public:
             RESAMPLED,
             OUT_OF_PARTICLES
         };
-        
+
         int Phase;
         int Particles;
     };
 
     SIMULATOR();
-    SIMULATOR(int numActions, int numObservations, double discount = 1.0);    
+    SIMULATOR(int numActions, int numObservations, double discount = 1.0);
     virtual ~SIMULATOR();
 
     // Create start state (can be stochastic)
@@ -84,14 +84,14 @@ public:
     // Free memory for state
     virtual void FreeState(STATE* state) const = 0;
 
-    // Update state according to action, and get observation and reward. 
+    // Update state according to action, and get observation and reward.
     // Return value of true indicates termination of episode (if episodic)
-    virtual bool Step(STATE& state, int action, 
+    virtual bool Step(STATE& state, int action,
         int& observation, double& reward) const = 0;
-        
+
     // Create new state and copy argument (must be same type)
     virtual STATE* Copy(const STATE& state) const = 0;
-    
+
     // Sanity check
     virtual void Validate(const STATE& state) const;
 
@@ -117,7 +117,7 @@ public:
         std::vector<int>& actions, const STATUS& status) const;
 
     // Textual display
-    virtual void DisplayBeliefs(const BELIEF_STATE& beliefState, 
+    virtual void DisplayBeliefs(const BELIEF_STATE& beliefState,
         std::ostream& ostr) const;
     virtual void DisplayState(const STATE& state, std::ostream& ostr) const;
     virtual void DisplayAction(int action, std::ostream& ostr) const;
@@ -132,7 +132,7 @@ public:
     double GetDiscount() const { return Discount; }
     double GetRewardRange() const { return RewardRange; }
     double GetHorizon(double accuracy, int undiscountedHorizon = 100) const; //XXX 这是怎么算的？
-    
+
 protected:
 
     int NumActions, NumObservations;

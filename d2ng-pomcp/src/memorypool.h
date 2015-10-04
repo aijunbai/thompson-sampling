@@ -7,18 +7,18 @@
 class MEMORY_OBJECT
 {
 public:
-	MEMORY_OBJECT(): Allocated(false) { }
+    MEMORY_OBJECT(): Allocated(false) { }
 
-	const MEMORY_OBJECT& operator=(const MEMORY_OBJECT&) {
-		return *this;
-	}
+    const MEMORY_OBJECT& operator=(const MEMORY_OBJECT&) {
+        return *this;
+    }
 
     void SetAllocated() {
-    	Allocated = true;
+        Allocated = true;
     }
 
     void ClearAllocated() {
-    	Allocated = false;
+        Allocated = false;
     }
 
     bool IsAllocated() const { return Allocated; }
@@ -42,20 +42,20 @@ public:
         DeleteAll();
     }
 
-//    T* Construct()
-//    {
-//        T* obj = Allocate();
-//        return new (obj) T;
-//    }
-//
-//    void Destroy(T* obj)
-//    {
-//        obj.T::~T();
-//        Free(obj);
-//    }
+    T* Construct()
+    {
+        T* obj = Allocate();
+        return new (obj) T;
+    }
 
-    T* Allocate() 
-    { 
+    void Destroy(T* obj)
+    {
+        obj.T::~T();
+        Free(obj);
+    }
+
+    T* Allocate()
+    {
         if (FreeList.empty()) {
             NewChunk();
         }
@@ -70,16 +70,16 @@ public:
 
         return obj;
     }
-    
-    void Free(T* obj) 
-    { 
+
+    void Free(T* obj)
+    {
         assert(obj->IsAllocated());
 
         obj->ClearAllocated();
         FreeList.push_back(obj);
         NumAllocated--;
     }
-    
+
     void DeleteAll()
     {
         for (ChunkIterator i_chunk = Chunks.begin(); i_chunk != Chunks.end(); ++i_chunk) {
@@ -91,7 +91,7 @@ public:
 
         NumAllocated = 0;
     }
-    
+
     int GetNumAllocated() const { return NumAllocated; }
 
 private:

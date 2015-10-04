@@ -29,7 +29,8 @@ HEADERS += src/battleship.h \
            src/tag.h \
            src/testsimulator.h \
            src/utils.h \
-           src/distribution.h
+           src/distribution.h \
+    src/rooms.h
 SOURCES += src/battleship.cpp \
            src/beliefstate.cpp \
            src/coord.cpp \
@@ -44,4 +45,5 @@ SOURCES += src/battleship.cpp \
            src/tag.cpp \
            src/testsimulator.cpp \
            src/utils.cpp \
-           src/distribution.cpp
+           src/distribution.cpp \
+    src/rooms.cpp

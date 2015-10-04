@@ -7,54 +7,51 @@
 
 struct RS_ENTRY
 {
-	bool Valuable;
-	bool Collected;
-	int Count;    				// Smart knowledge
-	int Measured; 				// Smart knowledge
-	double LikelihoodValuable;	// Smart knowledge
-	double LikelihoodWorthless;	// Smart knowledge
-	double ProbValuable;		// Smart knowledge
+    bool Valuable;
+    bool Collected;
+    int Count;    				// Smart knowledge
+    int Measured; 				// Smart knowledge
+    double LikelihoodValuable;	// Smart knowledge
+    double LikelihoodWorthless;	// Smart knowledge
+    double ProbValuable;		// Smart knowledge
 };
 
 inline std::size_t hash_value(const RS_ENTRY &v)
 {
-	using boost::hash_combine;
+    using boost::hash_combine;
 
-	// Start with a hash value of 0.
-	std::size_t seed = 0;
+    // Start with a hash value of 0.
+    std::size_t seed = 0;
 
-	// Modify 'seed' by XORing and bit-shifting in
-	// one member of 'Key' after the other:
-	hash_combine(seed, boost::hash_value(v.Valuable));
-	hash_combine(seed, boost::hash_value(v.Collected));
+    // Modify 'seed' by XORing and bit-shifting in
+    // one member of 'Key' after the other:
+    hash_combine(seed, boost::hash_value(v.Valuable));
+    hash_combine(seed, boost::hash_value(v.Collected));
 
-	// Return the result.
-	return seed;
+    // Return the result.
+    return seed;
 }
 
 class ROCKSAMPLE_STATE : public STATE
 {
 public:
-
     COORD AgentPos; //机器人位置
     std::vector<RS_ENTRY> Rocks; //每个石头的状态
 
     virtual size_t hash() const {
-    	using boost::hash_combine;
+        using boost::hash_combine;
 
-    	// Start with a hash value of 0    .
-    	std::size_t seed = 0;
+        // Start with a hash value of 0    .
+        std::size_t seed = 0;
 
-    	// Modify 'seed' by XORing and bit-shifting in
-    	// one member of 'Key' after the other:
-    	hash_combine(seed, hash_value(AgentPos));
-    	hash_combine(seed, boost::hash_value(Rocks));
+        // Modify 'seed' by XORing and bit-shifting in
+        // one member of 'Key' after the other:
+        hash_combine(seed, hash_value(AgentPos));
+        hash_combine(seed, boost::hash_value(Rocks));
 
-    	// Return the result.
-    	return seed;
+        // Return the result.
+        return seed;
     }
-
-//    int Target; // Smart knowledge
 };
 
 class ROCKSAMPLE : public SIMULATOR
@@ -119,16 +116,14 @@ protected:
     int Size, NumRocks;
     COORD StartPos;
     double HalfEfficiencyDistance; //控制观察函数的阈值
-    double SmartMoveProb;
 
 private:
-
     mutable MEMORY_POOL<ROCKSAMPLE_STATE> MemoryPool;
 };
 
 class FieldVisionRockSample: public ROCKSAMPLE {
 public:
-	FieldVisionRockSample(int size, int rocks);
+    FieldVisionRockSample(int size, int rocks);
 
     virtual bool Step(STATE& state, int action,
         int& observation, double& reward) const;

@@ -24,7 +24,7 @@ public:
 
     int GetXSize() const { return XSize; }
     int GetYSize() const { return YSize; }
-    
+
     T& operator()(int index)
     {
         assert(index >= 0 && index < XSize * YSize);
@@ -42,7 +42,7 @@ public:
         assert(Inside(coord));
         return Grid[Index(coord)];
     }
-    
+
     const T& operator()(const COORD& coord) const
     {
         assert(Inside(coord));
@@ -54,13 +54,13 @@ public:
         assert(Inside(COORD(x, y)));
         return Grid[Index(x, y)];
     }
-    
+
     const T& operator()(int x, int y) const
     {
         assert(Inside(COORD(x, y)));
         return Grid[Index(x, y)];
     }
-    
+
     int Index(const COORD& coord) const
     {
         return XSize * coord.Y + coord.X;
@@ -71,7 +71,7 @@ public:
         assert(Inside(COORD(x, y)));
         return XSize * y + x;
     }
-    
+
     bool Inside(const COORD& coord) const
     {
         return coord.X >= 0 && coord.Y >= 0
@@ -102,7 +102,7 @@ public:
             for (int y = 0; y < YSize; y++)
                 Grid[Index(x, y)] = value;
     }
-    
+
     void SetRow(int y, T* values)
     {
         for (int x = 0; x < XSize; x++)
@@ -113,36 +113,35 @@ public:
     {
         for (int y = 0; y < YSize; y++)
             Grid[Index(x, y)] = values[y];
-    }    
-    
+    }
+
     COORD Coord(int index) const
     {
         assert(index >= 0 && index < XSize * YSize);
         return COORD(index % XSize, index / XSize);
     }
-    
-public:
 
+public:
     int XSize, YSize;
     std::vector<T> Grid;
 };
 
 template <class T>
 inline std::size_t hash_value(const GRID<T> &v) {
-	using boost::hash_value;
-	using boost::hash_combine;
+    using boost::hash_value;
+    using boost::hash_combine;
 
-	// Start with a hash value of 0    .
-	std::size_t seed = 0;
+    // Start with a hash value of 0    .
+    std::size_t seed = 0;
 
-	// Modify 'seed' by XORing and bit-shifting in
-	// one member of 'Key' after the other:
-	hash_combine(seed, boost::hash_value(v.XSize));
-	hash_combine(seed, boost::hash_value(v.YSize));
-	hash_combine(seed, boost::hash_value(v.Grid));
+    // Modify 'seed' by XORing and bit-shifting in
+    // one member of 'Key' after the other:
+    hash_combine(seed, boost::hash_value(v.XSize));
+    hash_combine(seed, boost::hash_value(v.YSize));
+    hash_combine(seed, boost::hash_value(v.Grid));
 
-	// Return the result.
-	return seed;
+    // Return the result.
+    return seed;
 }
 
 #endif // GRID_H

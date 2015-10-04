@@ -12,8 +12,8 @@ using namespace UTILS;
 
 //-----------------------------------------------------------------------------
 
-MCTS::PARAMS::PARAMS()
-:   Verbose(0),
+MCTS::PARAMS::PARAMS():
+    Verbose(0),
     MaxDepth(100),
     NumSimulations(1000),
     NumStartStates(1000),
@@ -43,15 +43,15 @@ MCTS::MCTS(const SIMULATOR& simulator, const PARAMS& params)
     Root->Beliefs().AddSample(state);
 
     for (int i = 1; i < Params.NumStartStates; i++) {
-    	Root->Beliefs().AddSample(Simulator.CreateStartState()); //XXX 生成初始信念空间（样本集合） —— 至此 Root 节点构造完毕
+        Root->Beliefs().AddSample(Simulator.CreateStartState()); //XXX 生成初始信念空间（样本集合） —— 至此 Root 节点构造完毕
     }
 
     StatBeliefSize.Initialise();
     StatBeginTreeSize.Initialise();
-	StatEndTreeSize.Initialise();
-	StatIncTreeSize.Initialise();
+    StatEndTreeSize.Initialise();
+    StatIncTreeSize.Initialise();
 
-	assert(vnode::GetNumAllocated() == 1);
+    assert(vnode::GetNumAllocated() == 1);
 
     if (Params.Verbose >= 1)
         Simulator.DisplayBeliefs(Root->Beliefs(), cout);
@@ -61,11 +61,11 @@ MCTS::~MCTS()
 {
     if (Params.Verbose >= 1)
     {
-    	StatBeliefSize.Print("#Belief begin size", cout);
-    	StatBeginTreeSize.Print("#Tree begin size", cout);
-    	StatEndTreeSize.Print("#Tree end size", cout);
-    	StatIncTreeSize.Print("#Tree inc size", cout);
-    	StatNumSimulation.Print("#Num simulations", cout);
+        StatBeliefSize.Print("#Belief begin size", cout);
+        StatBeginTreeSize.Print("#Tree begin size", cout);
+        StatEndTreeSize.Print("#Tree end size", cout);
+        StatIncTreeSize.Print("#Tree inc size", cout);
+        StatNumSimulation.Print("#Num simulations", cout);
     }
 
     VNODE::Free(Root, Simulator);
@@ -99,7 +99,7 @@ bool MCTS::Update(int action, int observation, double /*reward*/)
         Simulator.DisplayBeliefs(beliefs, cout);
 
     if (Params.UseParticleFilter) { //增加更多样本！
-    	ParticleFilter(beliefs);
+        ParticleFilter(beliefs);
 
         if (Params.Verbose >= 1)
             Simulator.DisplayBeliefs(beliefs, cout);
@@ -125,19 +125,19 @@ bool MCTS::Update(int action, int observation, double /*reward*/)
         state = beliefs.GetSample(0);
 
     if (vnode && Params.ReuseTree) {
-    	int size1 = vnode::GetNumAllocated();
-    	VNODE::Free(Root, Simulator, vnode);
-    	int size2 = vnode::GetNumAllocated();
+        int size1 = vnode::GetNumAllocated();
+        VNODE::Free(Root, Simulator, vnode);
+        int size2 = vnode::GetNumAllocated();
 
-    	assert(size2 < size1);
+        assert(size2 < size1);
 
-    	Root = vnode;
-    	Root->Beliefs().Free(Simulator);
+        Root = vnode;
+        Root->Beliefs().Free(Simulator);
     }
     else {
-    	// Delete old tree and create new root
-    	VNODE::Free(Root, Simulator);
-    	Root = ExpandNode(state);
+        // Delete old tree and create new root
+        VNODE::Free(Root, Simulator);
+        Root = ExpandNode(state);
     }
 
     Root->Beliefs() = beliefs; //这里的 belief 是在搜索过程中产生的，没有显式进行 bayes 更新
@@ -147,9 +147,9 @@ bool MCTS::Update(int action, int observation, double /*reward*/)
 
 int MCTS::SelectAction()
 {
-	Search();
+    Search();
 
-	return ThompsonSampling(Root, false);
+    return ThompsonSampling(Root, false);
 }
 
 void MCTS::SearchImp()
@@ -171,7 +171,7 @@ void MCTS::SearchImp()
     std::vector<double> totalReward = SimulateV(*state, Root); //通过 Monte Carlo 方法得到 V 值
 
     for (uint i = 0; i < totalReward.size(); ++i) {
-    	StatTotalReward.Add(totalReward[i]);
+        StatTotalReward.Add(totalReward[i]);
     }
 
     StatTreeDepth.Add(PeakTreeDepth);
@@ -187,7 +187,7 @@ void MCTS::SearchImp()
 
 void MCTS::Search()
 {
-	assert(Root);
+    assert(Root);
 
     ClearStatistics();
 
@@ -196,26 +196,26 @@ void MCTS::Search()
     StatBeliefSize.Add(Root->Beliefs().GetNumSamples());
     StatBeginTreeSize.Add(treeBeginSize);
 
-	if (Params.TimeOutPerAction > 0.0) { //Anytime mode
-		boost::timer timer;
-		int i = 0;
+    if (Params.TimeOutPerAction > 0.0) { //Anytime mode
+        boost::timer timer;
+        int i = 0;
 
-		while (1) {
-			i += 1;
-			SearchImp();
+        while (1) {
+            i += 1;
+            SearchImp();
 
-			if (timer.elapsed() > Params.TimeOutPerAction) {
-				StatNumSimulation.Add(i);
-				break;
-			}
-		}
-	}
-	else {
-		for (int i = 0; i < Params.NumSimulations; i++) //总共仿真（迭代）次数
-		{
-			SearchImp();
-		}
-	}
+            if (timer.elapsed() > Params.TimeOutPerAction) {
+                StatNumSimulation.Add(i);
+                break;
+            }
+        }
+    }
+    else {
+        for (int i = 0; i < Params.NumSimulations; i++) //总共仿真（迭代）次数
+        {
+            SearchImp();
+        }
+    }
 
     StatEndTreeSize.Add(vnode::GetNumAllocated());
     StatIncTreeSize.Add(vnode::GetNumAllocated() - treeBeginSize);
@@ -225,16 +225,16 @@ void MCTS::Search()
 
 std::vector<double> MCTS::SimulateV(STATE& state, VNODE* vnode)
 {
-	int action = ThompsonSampling(vnode, true);
+    int action = ThompsonSampling(vnode, true);
 
     PeakTreeDepth = TreeDepth;
     if (TreeDepth >= Params.MaxDepth) { // search horizon reached
-    	return std::vector<double>(Rollouts, 0.0);
+        return std::vector<double>(Rollouts, 0.0);
     }
 
 #if MIXTURE_NORMAL
     if (TreeDepth >= 1) {
-    	AddSample(vnode, state); //state 加入到 vnode 对应的 belief 里去
+        AddSample(vnode, state); //state 加入到 vnode 对应的 belief 里去
     }
 #else
     if (TreeDepth == 1 || (TreeDepth >= 1 && Params.ReuseTree && TreeDepth > 1 && TreeDepth <= Params.ReuseDepth)) //需要为每个h节点维护粒子群
@@ -298,34 +298,34 @@ std::vector<double> MCTS::SimulateQ(STATE& state, QNODE& qnode, int action)
             delayedReward = SimulateV(state, vnode); //XXX
         }
         else {  //叶子节点
-        	vnode = ExpandNode(&state); //构造一个新节点
+            vnode = ExpandNode(&state); //构造一个新节点
 
-        	for (int i = 0; i < Rollouts; ++i) {
-        		STATE *copy = Simulator.Copy(state);
-        		delayedReward.push_back(Rollout(*copy));
-        		Simulator.FreeState(copy);
-        	}
+            for (int i = 0; i < Rollouts; ++i) {
+                STATE *copy = Simulator.Copy(state);
+                delayedReward.push_back(Rollout(*copy));
+                Simulator.FreeState(copy);
+            }
 
-        	vnode->GetCumulativeReward(state).Add(delayedReward);
+            vnode->GetCumulativeReward(state).Add(delayedReward);
         }
 
         TreeDepth--;
     }
     else {
-    	if (!vnode) {
-    		vnode = ExpandNode(&state); //终端节点
-    	}
+        if (!vnode) {
+            vnode = ExpandNode(&state); //终端节点
+        }
 
-    	vnode->GetCumulativeReward(state).Add(std::vector<double>(Rollouts, 0.0));
+        vnode->GetCumulativeReward(state).Add(std::vector<double>(Rollouts, 0.0));
     }
 
     if (delayedReward.empty()) {
-    	delayedReward = std::vector<double>(Rollouts, immediateReward);
+        delayedReward = std::vector<double>(Rollouts, immediateReward);
     }
     else {
-    	for (uint i = 0; i < delayedReward.size(); ++i) {
-    		delayedReward[i] = immediateReward + Simulator.GetDiscount() * delayedReward[i];
-    	}
+        for (uint i = 0; i < delayedReward.size(); ++i) {
+            delayedReward[i] = immediateReward + Simulator.GetDiscount() * delayedReward[i];
+        }
     }
 
     return delayedReward;
@@ -361,84 +361,84 @@ void MCTS::AddSample(VNODE* node, const STATE& state)
 
 int MCTS::ThompsonSampling(VNODE* vnode, bool sampling) const
 {
-	vector<int> unexplored_actions;
+    vector<int> unexplored_actions;
 
-	for (int action = 0; action < Simulator.GetNumActions(); action++) {
-		QNODE& qnode = vnode->Child(action);
+    for (int action = 0; action < Simulator.GetNumActions(); action++) {
+        QNODE& qnode = vnode->Child(action);
 
-		if (!qnode.Applicable()) { //非合法动作
-			continue;
-		}
+        if (!qnode.Applicable()) { //非合法动作
+            continue;
+        }
 
-		if (qnode.GetCount() <= 0) {
-			unexplored_actions.push_back(action);
-		}
-	}
+        if (qnode.GetCount() <= 0) {
+            unexplored_actions.push_back(action);
+        }
+    }
 
-	if (!unexplored_actions.empty()) {
-		return unexplored_actions[SimpleRNG::ins().Random(unexplored_actions.size())];
-	}
+    if (!unexplored_actions.empty()) {
+        return unexplored_actions[SimpleRNG::ins().Random(unexplored_actions.size())];
+    }
 
-	int besta = -1;
-	double bestq = -Infinity;
+    int besta = -1;
+    double bestq = -Infinity;
 
-	for (int action = 0; action < Simulator.GetNumActions(); action++)
-	{
-		QNODE& qnode = vnode->Child(action);
+    for (int action = 0; action < Simulator.GetNumActions(); action++)
+    {
+        QNODE& qnode = vnode->Child(action);
 
-		if (!qnode.Applicable()) { //非合法动作
-			continue;
-		}
+        if (!qnode.Applicable()) { //非合法动作
+            continue;
+        }
 
-		double q = QValue(qnode, sampling);
+        double q = QValue(qnode, sampling);
 
-		if (q > bestq) //XXX
-		{
-			bestq = q;
-			besta = action;
-		}
-	}
+        if (q > bestq) //XXX
+        {
+            bestq = q;
+            besta = action;
+        }
+    }
 
-	assert(besta != -1);
-	return besta;
+    assert(besta != -1);
+    return besta;
 }
 
 double MCTS::HValue(VNODE* vnode, bool sampling) const
 {
-	if (vnode) { //树上的节点
-		return vnode->/*GetCumulativeReward().*/ThompsonSampling(sampling); //XXX
-	}
-	else if (TreeDepth + 1 >= Params.MaxDepth) { // search horizon reached
-		return 0.0;
-	}
+    if (vnode) { //树上的节点
+        return vnode->/*GetCumulativeReward().*/ThompsonSampling(sampling); //XXX
+    }
+    else if (TreeDepth + 1 >= Params.MaxDepth) { // search horizon reached
+        return 0.0;
+    }
 
-	return NormalGammaInfo().ThompsonSampling(sampling); //按照默认分布返回
+    return NormalGammaInfo().ThompsonSampling(sampling); //按照默认分布返回
 }
 
 double MCTS::QValue(QNODE& qnode, bool sampling) const //改成多层调用？
 {
-	double qvalue = 0;
+    double qvalue = 0;
 
-	{
-		const std::vector<std::pair<int, double> > &observations = qnode.GetObservation().ThompsonSampling(sampling); //得到可能的观察分布
-		for (std::vector<std::pair<int, double> >::const_iterator it = observations.begin(); it != observations.end(); ++it) {
-			qvalue += it->second * HValue(qnode.Child(it->first), sampling);
-		}
-	}
+    {
+        const std::vector<std::pair<int, double> > &observations = qnode.GetObservation().ThompsonSampling(sampling); //得到可能的观察分布
+        for (std::vector<std::pair<int, double> >::const_iterator it = observations.begin(); it != observations.end(); ++it) {
+            qvalue += it->second * HValue(qnode.Child(it->first), sampling);
+        }
+    }
 
-	qvalue *= Simulator.GetDiscount();
+    qvalue *= Simulator.GetDiscount();
 
-	{
+    {
 #if not SAMPLE_REWARD
-		sampling = false;
+        sampling = false;
 #endif
-		const std::vector<std::pair<double, double> > &rewards = qnode.GetImmediateReward().ThompsonSampling(sampling); //得到可能的立即收益分布
-		for (std::vector<std::pair<double, double> >::const_iterator it = rewards.begin(); it != rewards.end(); ++it) {
-			qvalue += it->second * it->first;
-		}
-	}
+        const std::vector<std::pair<double, double> > &rewards = qnode.GetImmediateReward().ThompsonSampling(sampling); //得到可能的立即收益分布
+        for (std::vector<std::pair<double, double> >::const_iterator it = rewards.begin(); it != rewards.end(); ++it) {
+            qvalue += it->second * it->first;
+        }
+    }
 
-	return qvalue;
+    return qvalue;
 }
 
 double MCTS::Rollout(STATE& state) //从 state 出发随机选择动作 —— 理论上讲应该基于历史 rollout？XXX
@@ -481,33 +481,33 @@ double MCTS::Rollout(STATE& state) //从 state 出发随机选择动作 —— �
 
 void MCTS::ParticleFilter(BELIEF_STATE& beliefs) //unweighted particle filter
 {
-	int attempts = 0, added = 0;
+    int attempts = 0, added = 0;
     int max_attempts = (Params.NumStartStates - beliefs.GetNumSamples()) * 10;
 
     int realObs = History.Back().Observation;
-	int stepObs;
-	double stepReward;
+    int stepObs;
+    double stepReward;
 
     if (Params.Verbose >= 1)
     {
-    	cout << "MCTS::ParticleFilter: last step belief size " << Root->Beliefs().GetNumSamples() << ", current belief size " << beliefs.GetNumSamples() << endl;
+        cout << "MCTS::ParticleFilter: last step belief size " << Root->Beliefs().GetNumSamples() << ", current belief size " << beliefs.GetNumSamples() << endl;
     }
 
-	while (beliefs.GetNumSamples() < Params.NumStartStates && attempts < max_attempts) {
-		STATE* state = Root->Beliefs().CreateSample(Simulator);
+    while (beliefs.GetNumSamples() < Params.NumStartStates && attempts < max_attempts) {
+        STATE* state = Root->Beliefs().CreateSample(Simulator);
 
-		Simulator.Step(*state, History.Back().Action, stepObs, stepReward);
-	    Root->Child(History.Back().Action).Update(stepObs, stepReward);
+        Simulator.Step(*state, History.Back().Action, stepObs, stepReward);
+        Root->Child(History.Back().Action).Update(stepObs, stepReward);
 
-		if (stepObs == realObs) {
-			beliefs.AddSample(state);
-			added++;
-		}
-		else {
-			Simulator.FreeState(state);
-		}
-		attempts++;
-	}
+        if (stepObs == realObs) {
+            beliefs.AddSample(state);
+            added++;
+        }
+        else {
+            Simulator.FreeState(state);
+        }
+        attempts++;
+    }
 
     if (Params.Verbose >= 1)
     {
@@ -522,7 +522,7 @@ void MCTS::AddTransforms(BELIEF_STATE& beliefs)
 
     if (Params.Verbose >= 1)
     {
-    	cout << "MCTS::AddTransforms: last step belief size " << Root->Beliefs().GetNumSamples() << ", current belief size " << beliefs.GetNumSamples() << endl;
+        cout << "MCTS::AddTransforms: last step belief size " << Root->Beliefs().GetNumSamples() << ", current belief size " << beliefs.GetNumSamples() << endl;
     }
 
     // Local transformations of state that are consistent with history
@@ -594,11 +594,11 @@ void MCTS::DisplayValue(int depth, ostream& ostr) const
 
     std::vector<double> qvalues(VNODE::NumChildren);
     for (int action = 0; action < VNODE::NumChildren; action++) {
-    	QNODE &qnode = Root->Child(action);
+        QNODE &qnode = Root->Child(action);
 
-    	if (qnode.Applicable()) {
-    		qvalues[action] = QValue(qnode, false);
-    	}
+        if (qnode.Applicable()) {
+            qvalues[action] = QValue(qnode, false);
+        }
     }
 
     Root->DisplayValue(history, depth, ostr, &qvalues);

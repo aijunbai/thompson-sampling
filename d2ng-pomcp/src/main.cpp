@@ -3,6 +3,7 @@
 #include "network.h"
 #include "pocman.h"
 #include "rocksample.h"
+#include "rooms.h"
 #include "tag.h"
 #include "experiment.h"
 #include "statistic.h"
@@ -120,23 +121,23 @@ int main(int argc, char* argv[])
     }
     else if (problem == "pocman")
     {
-    	switch (size) {
-    	case 0:
-    		real = new MICRO_POCMAN;
-    		simulator = new MICRO_POCMAN;
-    		break;
-    	case 1:
-    		real = new MINI_POCMAN;
-    		simulator = new MINI_POCMAN;
-    		break;
-    	case 2:
-    		real = new FULL_POCMAN;
-    		simulator = new FULL_POCMAN;
-    		break;
-    	default:
-    		cout << "PocMan size 0|1|2" << endl;
-    		return 1;
-    	}
+        switch (size) {
+        case 0:
+            real = new MICRO_POCMAN;
+            simulator = new MICRO_POCMAN;
+            break;
+        case 1:
+            real = new MINI_POCMAN;
+            simulator = new MINI_POCMAN;
+            break;
+        case 2:
+            real = new FULL_POCMAN;
+            simulator = new FULL_POCMAN;
+            break;
+        default:
+            cout << "PocMan size 0|1|2" << endl;
+            return 1;
+        }
     }
     else if (problem == "network")
     {
@@ -150,25 +151,34 @@ int main(int argc, char* argv[])
     }
     else if (problem == "fieldvisionrocksample")
     {
-    	real = new FieldVisionRockSample(size, number);
-    	simulator = new FieldVisionRockSample(size, number);
+        real = new FieldVisionRockSample(size, number);
+        simulator = new FieldVisionRockSample(size, number);
     }
     else if (problem == "tag")
     {
         real = new TAG(number);
         simulator = new TAG(number);
     }
-    else 
+    else if (problem == "rooms")
+    {
+        real = new ROOMS("rooms.map");
+        simulator = new ROOMS("rooms.map", true);
+    }
+    else
     {
         cout << "Unknown problem" << endl;
         exit(1);
     }
 
     if (searchParams.TimeOutPerAction > 0.0) {
-    	expParams.MinDoubles = 0;
-    	expParams.MaxDoubles = 0;
-    	searchParams.NumSimulations = 0;
-    	searchParams.NumStartStates = pow(2, 10);
+        expParams.MinDoubles = 0;
+        expParams.MaxDoubles = 0;
+        searchParams.NumSimulations = 0;
+        searchParams.NumStartStates = pow(2, 10);
+    }
+
+    if (seeding) {
+      SimpleRNG::ins().RandomSeed(getpid());
     }
 
     simulator->SetKnowledge(knowledge);

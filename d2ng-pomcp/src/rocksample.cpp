@@ -9,8 +9,7 @@ using namespace UTILS;
 ROCKSAMPLE::ROCKSAMPLE(int size, int rocks)
 :   Grid(size, size),
     Size(size),
-    NumRocks(rocks),
-    SmartMoveProb(0.95)
+    NumRocks(rocks)
 {
     NumActions = NumRocks + 5; //动作数
     NumObservations = 3; //观察数
@@ -31,7 +30,7 @@ ROCKSAMPLE::ROCKSAMPLE(int size, int rocks)
 
 void ROCKSAMPLE::InitGeneral()
 {
-	vector<COORD> rocks; //保持模拟器和真实环境一致性
+    vector<COORD> rocks; //保持模拟器和真实环境一致性
 
   SimpleRNG::ins().RandomSeed(0);
 
@@ -45,7 +44,7 @@ void ROCKSAMPLE::InitGeneral()
         rocks.push_back(pos);
     }
 
-	FillField(rocks);
+    FillField(rocks);
 }
 
 void ROCKSAMPLE::Init_7_8()
@@ -209,7 +208,7 @@ bool ROCKSAMPLE::Step(STATE& state, int action,
         rockstate.Rocks[rock].Measured++;
 
         double distance = coord::EuclideanDistance(rockstate.AgentPos, RockPos[rock]);
-    	double efficiency = (1 + pow(2, -distance / HalfEfficiencyDistance)) * 0.5;
+        double efficiency = (1 + pow(2, -distance / HalfEfficiencyDistance)) * 0.5;
 
         if (observation == E_GOOD)
         {
@@ -223,10 +222,10 @@ bool ROCKSAMPLE::Step(STATE& state, int action,
             rockstate.Rocks[rock].Count--;
             rockstate.Rocks[rock].LikelihoodWorthless *= efficiency;
             rockstate.Rocks[rock].LikelihoodValuable *= 1.0 - efficiency;
-		}
-		double denom = (0.5 * rockstate.Rocks[rock].LikelihoodValuable) +
-			(0.5 * rockstate.Rocks[rock].LikelihoodWorthless);
-		rockstate.Rocks[rock].ProbValuable = (0.5 * rockstate.Rocks[rock].LikelihoodValuable) / denom;
+        }
+        double denom = (0.5 * rockstate.Rocks[rock].LikelihoodValuable) +
+            (0.5 * rockstate.Rocks[rock].LikelihoodWorthless);
+        rockstate.Rocks[rock].ProbValuable = (0.5 * rockstate.Rocks[rock].LikelihoodValuable) / denom;
     }
 
     assert(reward != -100);
@@ -236,28 +235,28 @@ bool ROCKSAMPLE::Step(STATE& state, int action,
 bool ROCKSAMPLE::LocalMove(STATE& state, const HISTORY& history,
     int stepObs, const STATUS& ) const //局部扰动
 {
-	if (NumRocks) {
-		ROCKSAMPLE_STATE& rockstate = safe_cast<ROCKSAMPLE_STATE&>(state);
-		int rock = SimpleRNG::ins().Random(NumRocks);
-		rockstate.Rocks[rock].Valuable = !rockstate.Rocks[rock].Valuable;
+    if (NumRocks) {
+        ROCKSAMPLE_STATE& rockstate = safe_cast<ROCKSAMPLE_STATE&>(state);
+        int rock = SimpleRNG::ins().Random(NumRocks);
+        rockstate.Rocks[rock].Valuable = !rockstate.Rocks[rock].Valuable;
 
-		if (history.Back().Action > E_SAMPLE) // check rock
-		{
-			rock = history.Back().Action - E_SAMPLE - 1;
-			int realObs = history.Back().Observation;
+        if (history.Back().Action > E_SAMPLE) // check rock
+        {
+            rock = history.Back().Action - E_SAMPLE - 1;
+            int realObs = history.Back().Observation;
 
-			// Condition new state on real observation
-			int newObs = GetObservation(rockstate, rock);
-			if (newObs != realObs)
-				return false;
+            // Condition new state on real observation
+            int newObs = GetObservation(rockstate, rock);
+            if (newObs != realObs)
+                return false;
 
-			// Update counts to be consistent with real observation
-			if (realObs == E_GOOD && stepObs == E_BAD)
-				rockstate.Rocks[rock].Count += 2;
-			if (realObs == E_BAD && stepObs == E_GOOD)
-				rockstate.Rocks[rock].Count -= 2;
-		}
-	}
+            // Update counts to be consistent with real observation
+            if (realObs == E_GOOD && stepObs == E_BAD)
+                rockstate.Rocks[rock].Count += 2;
+            if (realObs == E_BAD && stepObs == E_GOOD)
+                rockstate.Rocks[rock].Count -= 2;
+        }
+    }
     return true;
 }
 
@@ -268,24 +267,24 @@ void ROCKSAMPLE::GenerateLegal(const STATE& state, /*const HISTORY& ,*/
         safe_cast<const ROCKSAMPLE_STATE&>(state);
 
     if (Grid.Inside(rockstate.AgentPos)) {
-    	if (rockstate.AgentPos.Y + 1 < Size)
-    		legal.push_back(COORD::E_NORTH);
+        if (rockstate.AgentPos.Y + 1 < Size)
+            legal.push_back(COORD::E_NORTH);
 
-    	legal.push_back(COORD::E_EAST);
+        legal.push_back(COORD::E_EAST);
 
-    	if (rockstate.AgentPos.Y - 1 >= 0)
-    		legal.push_back(COORD::E_SOUTH);
+        if (rockstate.AgentPos.Y - 1 >= 0)
+            legal.push_back(COORD::E_SOUTH);
 
-    	if (rockstate.AgentPos.X - 1 >= 0)
-    		legal.push_back(COORD::E_WEST);
+        if (rockstate.AgentPos.X - 1 >= 0)
+            legal.push_back(COORD::E_WEST);
 
-    	int rock = Grid(rockstate.AgentPos);
-    	if (rock >= 0 && !rockstate.Rocks[rock].Collected)
-    		legal.push_back(E_SAMPLE);
+        int rock = Grid(rockstate.AgentPos);
+        if (rock >= 0 && !rockstate.Rocks[rock].Collected)
+            legal.push_back(E_SAMPLE);
 
-    	for (rock = 0; rock < NumRocks; ++rock)
-    		if (!rockstate.Rocks[rock].Collected)
-    			legal.push_back(rock + 1 + E_SAMPLE);
+        for (rock = 0; rock < NumRocks; ++rock)
+            if (!rockstate.Rocks[rock].Collected)
+                legal.push_back(rock + 1 + E_SAMPLE);
     }
 }
 
@@ -301,114 +300,114 @@ void ROCKSAMPLE::GeneratePreferred(const STATE& state, const HISTORY& history, /
 //		return;
 //	}
 
-	const ROCKSAMPLE_STATE& rockstate =
-	        safe_cast<const ROCKSAMPLE_STATE&>(state);
+    const ROCKSAMPLE_STATE& rockstate =
+            safe_cast<const ROCKSAMPLE_STATE&>(state);
 
-	if (!Grid.Inside(rockstate.AgentPos)) {
-		return;
-	}
+    if (!Grid.Inside(rockstate.AgentPos)) {
+        return;
+    }
 
-	// Sample rocks with more +ve than -ve observations
-	int rock = Grid(rockstate.AgentPos);
-	if (rock >= 0 && !rockstate.Rocks[rock].Collected)
-	{
-		int total = 0;
-		for (int t = 0; t < history.Size(); ++t)
-		{
-			if (history[t].Action == rock + 1 + E_SAMPLE)
-			{
-				if (history[t].Observation == E_GOOD)
-					total++;
-				if (history[t].Observation == E_BAD)
-					total--;
-			}
-		}
-		if (total > 0)
-		{
-			actions.push_back(E_SAMPLE);
-			return;
-		}
+    // Sample rocks with more +ve than -ve observations
+    int rock = Grid(rockstate.AgentPos);
+    if (rock >= 0 && !rockstate.Rocks[rock].Collected)
+    {
+        int total = 0;
+        for (int t = 0; t < history.Size(); ++t)
+        {
+            if (history[t].Action == rock + 1 + E_SAMPLE)
+            {
+                if (history[t].Observation == E_GOOD)
+                    total++;
+                if (history[t].Observation == E_BAD)
+                    total--;
+            }
+        }
+        if (total > 0)
+        {
+            actions.push_back(E_SAMPLE);
+            return;
+        }
 
-	}
+    }
 
-	// processes the rocks
-	bool all_bad = true;
-	bool north_interesting = false;
-	bool south_interesting = false;
-	bool west_interesting  = false;
-	bool east_interesting  = false;
+    // processes the rocks
+    bool all_bad = true;
+    bool north_interesting = false;
+    bool south_interesting = false;
+    bool west_interesting  = false;
+    bool east_interesting  = false;
 
-	for (int rock = 0; rock < NumRocks; ++rock)
-	{
-		const RS_ENTRY& entry = rockstate.Rocks[rock];
-		if (!entry.Collected)
-		{
-			int total = 0;
-			for (int t = 0; t < history.Size(); ++t)
-			{
-				if (history[t].Action == rock + 1 + E_SAMPLE)
-				{
-					if (history[t].Observation == E_GOOD)
-						total++;
-					if (history[t].Observation == E_BAD)
-						total--;
-				}
-			}
+    for (int rock = 0; rock < NumRocks; ++rock)
+    {
+        const RS_ENTRY& entry = rockstate.Rocks[rock];
+        if (!entry.Collected)
+        {
+            int total = 0;
+            for (int t = 0; t < history.Size(); ++t)
+            {
+                if (history[t].Action == rock + 1 + E_SAMPLE)
+                {
+                    if (history[t].Observation == E_GOOD)
+                        total++;
+                    if (history[t].Observation == E_BAD)
+                        total--;
+                }
+            }
 
-			if (total >= 0)
-			{
-				all_bad = false;
+            if (total >= 0)
+            {
+                all_bad = false;
 
-				if (RockPos[rock].Y > rockstate.AgentPos.Y)
-					north_interesting = true;
-				if (RockPos[rock].Y < rockstate.AgentPos.Y)
-					south_interesting = true;
-				if (RockPos[rock].X < rockstate.AgentPos.X)
-					west_interesting = true;
-				if (RockPos[rock].X > rockstate.AgentPos.X)
-					east_interesting = true;
-			}
-		}
-	}
+                if (RockPos[rock].Y > rockstate.AgentPos.Y)
+                    north_interesting = true;
+                if (RockPos[rock].Y < rockstate.AgentPos.Y)
+                    south_interesting = true;
+                if (RockPos[rock].X < rockstate.AgentPos.X)
+                    west_interesting = true;
+                if (RockPos[rock].X > rockstate.AgentPos.X)
+                    east_interesting = true;
+            }
+        }
+    }
 
-	// if all remaining rocks seem bad, then head east
-	if (all_bad)
-	{
-		actions.push_back(COORD::E_EAST);
-		return;
-	}
+    // if all remaining rocks seem bad, then head east
+    if (all_bad)
+    {
+        actions.push_back(COORD::E_EAST);
+        return;
+    }
 
-	// generate a random legal move, with the exceptions that:
-	//   a) there is no point measuring a rock that is already collected
-	//   b) there is no point measuring a rock too often
-	//   c) there is no point measuring a rock which is clearly bad or good
-	//   d) we never sample a rock (since we need to be sure)
-	//   e) we never move in a direction that doesn't take us closer to
-	//      either the edge of the map or an interesting rock
-	if (rockstate.AgentPos.Y + 1 < Size && north_interesting)
-			actions.push_back(COORD::E_NORTH);
+    // generate a random legal move, with the exceptions that:
+    //   a) there is no point measuring a rock that is already collected
+    //   b) there is no point measuring a rock too often
+    //   c) there is no point measuring a rock which is clearly bad or good
+    //   d) we never sample a rock (since we need to be sure)
+    //   e) we never move in a direction that doesn't take us closer to
+    //      either the edge of the map or an interesting rock
+    if (rockstate.AgentPos.Y + 1 < Size && north_interesting)
+            actions.push_back(COORD::E_NORTH);
 
-	if (east_interesting)
-		actions.push_back(COORD::E_EAST);
+    if (east_interesting)
+        actions.push_back(COORD::E_EAST);
 
-	if (rockstate.AgentPos.Y - 1 >= 0 && south_interesting)
-		actions.push_back(COORD::E_SOUTH);
+    if (rockstate.AgentPos.Y - 1 >= 0 && south_interesting)
+        actions.push_back(COORD::E_SOUTH);
 
-	if (rockstate.AgentPos.X - 1 >= 0 && west_interesting)
-		actions.push_back(COORD::E_WEST);
+    if (rockstate.AgentPos.X - 1 >= 0 && west_interesting)
+        actions.push_back(COORD::E_WEST);
 
 
-	for (rock = 0; rock < NumRocks; ++rock)
-	{
-		if (!rockstate.Rocks[rock].Collected    &&
-			rockstate.Rocks[rock].ProbValuable != 0.0 &&
-			rockstate.Rocks[rock].ProbValuable != 1.0 &&
-			rockstate.Rocks[rock].Measured < 5  &&
-			std::abs(rockstate.Rocks[rock].Count) < 2)
-		{
-			actions.push_back(rock + 1 + E_SAMPLE);
-		}
-	}
+    for (rock = 0; rock < NumRocks; ++rock)
+    {
+        if (!rockstate.Rocks[rock].Collected    &&
+            rockstate.Rocks[rock].ProbValuable != 0.0 &&
+            rockstate.Rocks[rock].ProbValuable != 1.0 &&
+            rockstate.Rocks[rock].Measured < 5  &&
+            std::abs(rockstate.Rocks[rock].Count) < 2)
+        {
+            actions.push_back(rock + 1 + E_SAMPLE);
+        }
+    }
 }
 
 int ROCKSAMPLE::GetObservation(const ROCKSAMPLE_STATE& rockstate, int rock) const //noisy observation
@@ -425,27 +424,27 @@ int ROCKSAMPLE::GetObservation(const ROCKSAMPLE_STATE& rockstate, int rock) cons
 void ROCKSAMPLE::DisplayBeliefs(const BELIEF_STATE& belief,
     std::ostream& ostr) const
 {
-	std::vector<double> prob(NumRocks);
+    std::vector<double> prob(NumRocks);
 
-	for (int i = 0; i < belief.GetNumSamples(); ++i) {
-		const ROCKSAMPLE_STATE& rockstate = safe_cast<const ROCKSAMPLE_STATE&>(*belief.GetSample(i));
+    for (int i = 0; i < belief.GetNumSamples(); ++i) {
+        const ROCKSAMPLE_STATE& rockstate = safe_cast<const ROCKSAMPLE_STATE&>(*belief.GetSample(i));
 
-		for (int j = 0; j < NumRocks; ++j) {
-			if (!rockstate.Rocks[j].Collected) {
-				prob[j] += rockstate.Rocks[j].Valuable;
-			}
-		}
-	}
+        for (int j = 0; j < NumRocks; ++j) {
+            if (!rockstate.Rocks[j].Collected) {
+                prob[j] += rockstate.Rocks[j].Valuable;
+            }
+        }
+    }
 
-	ostr << "#Belief: ";
-	for (int j = 0; j < NumRocks; ++j) {
-		prob[j] /= belief.GetNumSamples();
+    ostr << "#Belief: ";
+    for (int j = 0; j < NumRocks; ++j) {
+        prob[j] /= belief.GetNumSamples();
 
-		if (prob[j] > 0.0) {
-			ostr << "#" << j << "(" << prob[j] << ") ";
-		}
-	}
-	ostr << std::endl;
+        if (prob[j] > 0.0) {
+            ostr << "#" << j << "(" << prob[j] << ") ";
+        }
+    }
+    ostr << std::endl;
 }
 
 void ROCKSAMPLE::DisplayState(const STATE& state, std::ostream& ostr) const
@@ -511,18 +510,18 @@ FieldVisionRockSample::FieldVisionRockSample(int size, int rocks): ROCKSAMPLE(si
 bool FieldVisionRockSample::Step(STATE& state, int action,
     int& observation, double& reward) const
 {
-	int tmp_obs;
-	double tmp_reward;
+    int tmp_obs;
+    double tmp_reward;
 
-	observation = 0;
-	for (int i = 0; i < NumRocks; ++i) {
-		tmp_obs = 0;
-		ROCKSAMPLE::Step(state, i + E_SAMPLE + 1, tmp_obs, tmp_reward);
-		observation = (observation << 1) + tmp_obs - 1;
-	}
+    observation = 0;
+    for (int i = 0; i < NumRocks; ++i) {
+        tmp_obs = 0;
+        ROCKSAMPLE::Step(state, i + E_SAMPLE + 1, tmp_obs, tmp_reward);
+        observation = (observation << 1) + tmp_obs - 1;
+    }
 
-	assert(action <= E_SAMPLE);
-	return ROCKSAMPLE::Step(state, action, tmp_obs, reward);
+    assert(action <= E_SAMPLE);
+    return ROCKSAMPLE::Step(state, action, tmp_obs, reward);
 }
 
 void FieldVisionRockSample::GenerateLegal(const STATE& state, /*const HISTORY& history,*/
@@ -532,46 +531,46 @@ void FieldVisionRockSample::GenerateLegal(const STATE& state, /*const HISTORY& h
         safe_cast<const ROCKSAMPLE_STATE&>(state);
 
     if (Grid.Inside(rockstate.AgentPos)) {
-    	if (rockstate.AgentPos.Y + 1 < Size)
-    		legal.push_back(COORD::E_NORTH);
+        if (rockstate.AgentPos.Y + 1 < Size)
+            legal.push_back(COORD::E_NORTH);
 
-    	legal.push_back(COORD::E_EAST);
+        legal.push_back(COORD::E_EAST);
 
-    	if (rockstate.AgentPos.Y - 1 >= 0)
-    		legal.push_back(COORD::E_SOUTH);
+        if (rockstate.AgentPos.Y - 1 >= 0)
+            legal.push_back(COORD::E_SOUTH);
 
-    	if (rockstate.AgentPos.X - 1 >= 0)
-    		legal.push_back(COORD::E_WEST);
+        if (rockstate.AgentPos.X - 1 >= 0)
+            legal.push_back(COORD::E_WEST);
 
-    	int rock = Grid(rockstate.AgentPos);
-    	if (rock >= 0 && !rockstate.Rocks[rock].Collected)
-    		legal.push_back(E_SAMPLE);
+        int rock = Grid(rockstate.AgentPos);
+        if (rock >= 0 && !rockstate.Rocks[rock].Collected)
+            legal.push_back(E_SAMPLE);
     }
 }
 
 void FieldVisionRockSample::GeneratePreferred(const STATE& state, const HISTORY& /*history*/,
     std::vector<int>& actions, const STATUS& status) const
 {
-	GenerateLegal(state, actions, status);
+    GenerateLegal(state, actions, status);
 }
 
 bool FieldVisionRockSample::LocalMove(STATE& state, const HISTORY& /*history*/,
     int /*stepObs*/, const STATUS& ) const
 {
-	if (NumRocks) {
-		ROCKSAMPLE_STATE& rockstate = safe_cast<ROCKSAMPLE_STATE&>(state);
-		int rock = SimpleRNG::ins().Random(NumRocks);
+    if (NumRocks) {
+        ROCKSAMPLE_STATE& rockstate = safe_cast<ROCKSAMPLE_STATE&>(state);
+        int rock = SimpleRNG::ins().Random(NumRocks);
 
-		if (!rockstate.Rocks[rock].Collected) {
-			rockstate.Rocks[rock].Valuable = !rockstate.Rocks[rock].Valuable;
-		}
-	}
+        if (!rockstate.Rocks[rock].Collected) {
+            rockstate.Rocks[rock].Valuable = !rockstate.Rocks[rock].Valuable;
+        }
+    }
 
     return true;
 }
 
 void FieldVisionRockSample::DisplayObservation(const STATE& , int observation, std::ostream& ostr) const
 {
-	std::bitset<32> x(observation);
-	ostr << "observation: " << x << endl;
+    std::bitset<32> x(observation);
+    ostr << "observation: " << x << endl;
 }

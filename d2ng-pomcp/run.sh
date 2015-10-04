@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PROBLEM="rocksample"
+PROBLEM="rooms"
 SIZE=7
 NUM=8
 LEVELT=1
