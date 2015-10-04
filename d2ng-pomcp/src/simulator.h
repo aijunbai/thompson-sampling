@@ -130,13 +130,12 @@ public:
     int GetNumObservations() const { return NumObservations; }
     bool IsEpisodic() const { return false; }
     double GetDiscount() const { return Discount; }
-    double GetRewardRange() const { return RewardRange; }
     double GetHorizon(double accuracy, int undiscountedHorizon = 100) const; //XXX 这是怎么算的？
 
 protected:
 
     int NumActions, NumObservations;
-    double Discount, RewardRange;
+    double Discount;
     KNOWLEDGE Knowledge;
 };
 

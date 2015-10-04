@@ -15,17 +15,7 @@ BATTLESHIP::BATTLESHIP(int xsize, int ysize, int maxlength)
 {
     NumActions = XSize * YSize;
     NumObservations = 2;
-    RewardRange = NumActions / 4.0;
-
     Discount = 1;
-
-    /*TotalRemaining = 0;
-    for (int length = MaxLength; length >= 2; --length)
-    {
-        int numShips = MaxLength + 1 - length;
-        TotalRemaining += numShips * length;
-    }*/
-
     TotalRemaining = MaxLength - 1;
 }
 
@@ -434,7 +424,7 @@ void BATTLESHIP::DisplayObservation(const STATE& , int observation, ostream& ost
     if (observation)
         ostr << "o=Hit\n";
     else
-    	ostr << "o=Miss\n";
+        ostr << "o=Miss\n";
 }
 
 void BATTLESHIP::DisplayAction(int action, ostream& ostr) const

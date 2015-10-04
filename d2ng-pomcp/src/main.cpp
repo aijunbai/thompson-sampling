@@ -162,7 +162,7 @@ int main(int argc, char* argv[])
     else if (problem == "rooms")
     {
         real = new ROOMS("rooms.map");
-        simulator = new ROOMS("rooms.map", true);
+        simulator = new ROOMS("rooms.map");
     }
     else
     {

@@ -3,6 +3,7 @@
 #include "distribution.h"
 #include <bitset>
 #include <fstream>
+#include <boost/unordered_map.hpp>
 
 using namespace std;
 using namespace UTILS;
@@ -33,7 +34,7 @@ void ROOMS::Parse(const char *file_name)
         return;
     }
 
-    int xsize, ysize;
+    uint xsize, ysize;
 
     fin.ignore(LINE_MAX, ' ');
     fin >> xsize >> ysize;
@@ -55,7 +56,9 @@ void ROOMS::Parse(const char *file_name)
         }
 
         for (uint col = 0; col < line.size(); ++col) {
-            mGrid->operator ()(row, col) = line[col];
+            int x = col;
+            int y = ysize - 1 - row;
+            mGrid->operator ()(x, y) = line[col];
         }
         row += 1;
     }
@@ -150,15 +153,27 @@ int ROOMS::GetObservation(const ROOMS_STATE& rooms_state) const
 void ROOMS::DisplayBeliefs(const BELIEF_STATE& belief,
     std::ostream& ostr) const
 {
-    //XXX
+    boost::unordered_map<COORD, int> m;
+    for (int i = 0; i < belief.GetNumSamples(); ++i) {
+        const ROOMS_STATE& state = safe_cast<const ROOMS_STATE&>(*belief.GetSample(i));
+        m[state.AgentPos] += 1;
+    }
+
+    ostr << "#Belief: ";
+    for (boost::unordered_map<COORD, int>::iterator it = m.begin(); it != m.end(); ++it) {
+        ostr << "#" << it->first << " (" << double(it->second) / double(belief.GetNumSamples()) << ") ";
+    }
+
+    ostr << std::endl;
 }
 
 void ROOMS::DisplayState(const STATE& state, std::ostream& ostr) const
 {
     const ROOMS_STATE& rooms_state = safe_cast<const ROOMS_STATE&>(state);
 
-    for (int x = 0; x < mGrid->GetXSize(); ++x) {
-        for (int y = 0; y < mGrid->GetYSize(); ++y) {
+    ostr << "Y" << endl;
+    for (int y = mGrid->GetYSize() - 1; y >= 0; --y) {
+        for (int x = 0; x < mGrid->GetXSize(); ++x) {
             char cell = mGrid->operator()(x, y);
 
             if (rooms_state.AgentPos == COORD(x, y)) {
@@ -171,7 +186,12 @@ void ROOMS::DisplayState(const STATE& state, std::ostream& ostr) const
                 ostr << cell;
             }
         }
-        ostr << endl;
+        if (y == 0) {
+            ostr << "X" << endl;
+        }
+        else {
+            ostr << endl;
+        }
     }
     ostr << endl;
 }

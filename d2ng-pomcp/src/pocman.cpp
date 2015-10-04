@@ -35,7 +35,6 @@ POCMAN::POCMAN(int xsize, int ysize)
         // Can move W
         // Smell food
         // Hear ghost
-    RewardRange = 100;
 
     Discount = 0.95;
 }
@@ -262,7 +261,7 @@ bool POCMAN::LocalMove(STATE& state, const HISTORY& history,
     int , const STATUS& ) const
 {
     POCMAN_STATE& pocstate = safe_cast<POCMAN_STATE&>(state);
-    
+
     int numGhosts = SimpleRNG::ins().Random(1, 3); // Change 1 or 2 ghosts at a time
     for (int i = 0; i < numGhosts; ++i)
     {
@@ -270,7 +269,7 @@ bool POCMAN::LocalMove(STATE& state, const HISTORY& history,
         pocstate.GhostPos[g] = COORD(
             SimpleRNG::ins().Random(Maze.GetXSize()),
             SimpleRNG::ins().Random(Maze.GetYSize()));
-        if (!Passable(pocstate.GhostPos[g]) 
+        if (!Passable(pocstate.GhostPos[g])
             || pocstate.GhostPos[g] == pocstate.PocmanPos)
             return false;
     }
@@ -282,7 +281,7 @@ bool POCMAN::LocalMove(STATE& state, const HISTORY& history,
         {
             COORD pos = pocstate.PocmanPos + smellPos;
             if (smellPos != COORD(0, 0) &&
-                Maze.Inside(pos) && 
+                Maze.Inside(pos) &&
                 CheckFlag(Maze(pos), E_SEED))
                 pocstate.Food[Maze.Index(pos)] = SimpleRNG::ins().Bernoulli(FoodProb * 0.5);
         }
@@ -445,7 +444,7 @@ bool POCMAN::SmellFood(const POCMAN_STATE& pocstate) const
     COORD smellPos;
     for (smellPos.X = -SmellRange; smellPos.X <= SmellRange; smellPos.X++)
         for (smellPos.Y = -SmellRange; smellPos.Y <= SmellRange; smellPos.Y++)
-            if (Maze.Inside(pocstate.PocmanPos + smellPos) 
+            if (Maze.Inside(pocstate.PocmanPos + smellPos)
                 && pocstate.Food[Maze.Index(pocstate.PocmanPos + smellPos)])
                 return true;
     return false;
@@ -456,7 +455,7 @@ void POCMAN::GenerateLegal(const STATE& state, /*const HISTORY& ,*/
 {
     const POCMAN_STATE& pocstate = safe_cast<const POCMAN_STATE&>(state);
 
-    // Don't move into walls 
+    // Don't move into walls
     for (int a = 0; a < 4; ++a)
     {
         COORD newpos = NextPos(pocstate.PocmanPos, a);
@@ -481,13 +480,13 @@ void POCMAN::GeneratePreferred(const STATE& state, const HISTORY& history,
                 if (CheckFlag(observation, a))
                     actions.push_back(a);
         }
-        
+
         // Otherwise avoid observed ghosts and avoid changing directions
         else
         {
             for (int a = 0; a < 4; ++a)
             {
-                COORD newpos = NextPos(pocstate.PocmanPos, a);        
+                COORD newpos = NextPos(pocstate.PocmanPos, a);
                 if (newpos.Valid() && !CheckFlag(observation, a)
                     && coord::Opposite(a) != action)
                     actions.push_back(a);
@@ -586,7 +585,7 @@ void POCMAN::DisplayObservation(const STATE& state, int observation, ostream& os
         }
 
         // Feel wall
-        if (!CheckFlag(observation, d + 4) 
+        if (!CheckFlag(observation, d + 4)
             && Maze.Inside(pocstate.PocmanPos + coord::Compass[d]))
             obs(pocstate.PocmanPos + coord::Compass[d]) = '#';
     }
@@ -598,7 +597,7 @@ void POCMAN::DisplayObservation(const STATE& state, int observation, ostream& os
         for (hearPos.X = -HearRange; hearPos.X <= HearRange; hearPos.X++)
             for (hearPos.Y = -HearRange; hearPos.Y <= HearRange; hearPos.Y++)
                 if (coord::ManhattanDistance(hearPos, pocstate.PocmanPos) <= HearRange
-                    && Maze.Inside(pocstate.PocmanPos + hearPos) 
+                    && Maze.Inside(pocstate.PocmanPos + hearPos)
                     && obs(pocstate.PocmanPos + hearPos) == ' ')
                     obs(pocstate.PocmanPos + hearPos) = (pocstate.PowerSteps == 0 ? 'H': 'h');
     }
@@ -609,7 +608,7 @@ void POCMAN::DisplayObservation(const STATE& state, int observation, ostream& os
         COORD smellPos;
         for (smellPos.X = -SmellRange; smellPos.X <= SmellRange; smellPos.X++)
             for (smellPos.Y = -SmellRange; smellPos.Y <= SmellRange; smellPos.Y++)
-                if (Maze.Inside(pocstate.PocmanPos + smellPos) 
+                if (Maze.Inside(pocstate.PocmanPos + smellPos)
                     && obs(pocstate.PocmanPos + smellPos) == ' ')
                     obs(pocstate.PocmanPos + smellPos) = '.';
     }

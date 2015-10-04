@@ -13,10 +13,8 @@ NETWORK::NETWORK(int numMachines, int ntype)
 {
     NumActions = NumMachines * 2 + 1;
     NumObservations = 3;
-    RewardRange = NumMachines * 2;
-
     Discount = 0.95;
-    
+
     switch (ntype)
     {
     case E_CYCLE:
@@ -61,7 +59,7 @@ STATE* NETWORK::Copy(const STATE& state) const
     const NETWORK_STATE& nstate = safe_cast<const NETWORK_STATE&>(state);
     NETWORK_STATE* newstate = MemoryPool.Allocate();
     *newstate = nstate;
-    return newstate; 
+    return newstate;
 }
 
 void NETWORK::Validate(const STATE& ) const
@@ -84,7 +82,7 @@ void NETWORK::FreeState(STATE* state) const
     MemoryPool.Free(nstate);
 }
 
-bool NETWORK::Step(STATE& state, int action, 
+bool NETWORK::Step(STATE& state, int action,
     int& observation, double& reward) const
 {
     NETWORK_STATE& nstate = safe_cast<NETWORK_STATE&>(state);
@@ -104,7 +102,7 @@ bool NETWORK::Step(STATE& state, int action,
         else
             nstate.Machines[i] = !SimpleRNG::ins().Bernoulli(FailureProb2);
     }
-         
+
     for (int i = 0; i < NumMachines; i++)
     {
         if (nstate.Machines[i])
@@ -115,12 +113,12 @@ bool NETWORK::Step(STATE& state, int action,
                 reward += 1;
         }
     }
-    
+
     if (action < NumMachines * 2)
     {
         int machine = action / 2;
         bool reboot = action % 2;
-        
+
         if (reboot)
         {
             reward -= 2.5;
@@ -136,7 +134,7 @@ bool NETWORK::Step(STATE& state, int action,
                 observation = !nstate.Machines[machine];
         }
     }
-    
+
     return false;
 }
 

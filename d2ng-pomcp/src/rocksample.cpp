@@ -13,8 +13,6 @@ ROCKSAMPLE::ROCKSAMPLE(int size, int rocks)
 {
     NumActions = NumRocks + 5; //动作数
     NumObservations = 3; //观察数
-    RewardRange = 20;
-
     Discount = 0.95;
 
     HalfEfficiencyDistance = 20;

@@ -10,7 +10,7 @@
 struct COORD
 {
     int X, Y;
-    
+
     COORD(int x = -1, int y = -1)
     :   X(x), Y(y) { }
 
@@ -23,7 +23,7 @@ struct COORD
     {
         return X == rhs.X && Y == rhs.Y;
     }
-    
+
     bool operator!=(const COORD &rhs) const
     {
         return X != rhs.X || Y != rhs.Y;
@@ -39,7 +39,7 @@ struct COORD
     {
         return COORD(X + rhs.X, Y + rhs.Y);
     }
-    
+
     COORD operator*(int mul) const
     {
         return COORD(X * mul, Y * mul);
@@ -57,23 +57,27 @@ struct COORD
         E_NORTHWEST
     };
 
+    friend std::ostream &operator <<(std::ostream& os, const COORD &o) {
+        return os << "[" << o.X << ", " << o.Y << "]";
+    }
+
     static void UnitTest();
 };
 
 inline std::size_t hash_value(const COORD &v)
 {
-	using boost::hash_combine;
+    using boost::hash_combine;
 
-	// Start with a hash value of 0.
-	std::size_t seed = 0;
+    // Start with a hash value of 0.
+    std::size_t seed = 0;
 
-	// Modify 'seed' by XORing and bit-shifting in
-	// one member of 'Key' after the other:
-	hash_combine(seed, boost::hash_value(v.X));
-	hash_combine(seed, boost::hash_value(v.Y));
+    // Modify 'seed' by XORing and bit-shifting in
+    // one member of 'Key' after the other:
+    hash_combine(seed, boost::hash_value(v.X));
+    hash_combine(seed, boost::hash_value(v.Y));
 
-	// Return the result.
-	return seed;
+    // Return the result.
+    return seed;
 }
 
 namespace coord {
@@ -90,25 +94,25 @@ inline int Anticlockwise(int dir) { return (dir + 3) % 4; }
 
 inline double EuclideanDistance(const COORD &lhs, const COORD &rhs)
 {
-	return sqrt((lhs.X - rhs.X) * (lhs.X - rhs.X)
-			+ (lhs.Y - rhs.Y) * (lhs.Y - rhs.Y));
+    return sqrt((lhs.X - rhs.X) * (lhs.X - rhs.X)
+            + (lhs.Y - rhs.Y) * (lhs.Y - rhs.Y));
 }
 
 inline int ManhattanDistance(const COORD &lhs, const COORD &rhs)
 {
-	return abs(lhs.X - rhs.X) + abs(lhs.Y - rhs.Y);
+    return abs(lhs.X - rhs.X) + abs(lhs.Y - rhs.Y);
 }
 
 inline int DirectionalDistance(const COORD &lhs, const COORD &rhs, int direction)
 {
-	switch (direction)
-	{
-	case COORD::E_NORTH: return rhs.Y - lhs.Y;
-	case COORD::E_EAST: return rhs.X - lhs.X;
-	case COORD::E_SOUTH: return lhs.Y - rhs.Y;
-	case COORD::E_WEST: return lhs.X - rhs.X;
-	default: assert(false); return 0;
-	}
+    switch (direction)
+    {
+    case COORD::E_NORTH: return rhs.Y - lhs.Y;
+    case COORD::E_EAST: return rhs.X - lhs.X;
+    case COORD::E_SOUTH: return lhs.Y - rhs.Y;
+    case COORD::E_WEST: return lhs.X - rhs.X;
+    default: assert(false); return 0;
+    }
 }
 };
 

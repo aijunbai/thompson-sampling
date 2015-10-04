@@ -18,29 +18,27 @@ SIMULATOR::STATUS::STATUS()
 {
 }
 
-SIMULATOR::SIMULATOR() 
+SIMULATOR::SIMULATOR()
 :   NumActions(0),
     NumObservations(0),
-    Discount(1.0),
-    RewardRange(1.0)
+    Discount(1.0)
 {
 }
 
 SIMULATOR::SIMULATOR(int numActions, int numObservations, double discount)
 :   NumActions(numActions),
     NumObservations(numObservations),
-    Discount(discount),
-    RewardRange(1.0)
-{ 
+    Discount(discount)
+{
     assert(discount > 0 && discount <= 1);
 }
 
-SIMULATOR::~SIMULATOR() 
-{ 
+SIMULATOR::~SIMULATOR()
+{
 }
 
 void SIMULATOR::Validate(const STATE& ) const
-{ 
+{
 }
 
 bool SIMULATOR::LocalMove(STATE& , const HISTORY& ,
@@ -73,7 +71,7 @@ int SIMULATOR::SelectRandom(const STATE& state, const HISTORY& history,
         if (!actions.empty())
             return actions[SimpleRNG::ins().Random(actions.size())];
     }
-        
+
     if (Knowledge.RolloutLevel >= KNOWLEDGE::LEGAL)
     {
         actions.clear();
@@ -88,7 +86,7 @@ int SIMULATOR::SelectRandom(const STATE& state, const HISTORY& history,
 void SIMULATOR::Prior(const STATE* state, const HISTORY& history,
     VNODE* vnode, const STATUS& status) const
 {
-	static std::vector<int> actions;
+    static std::vector<int> actions;
 
     if (Knowledge.TreeLevel == KNOWLEDGE::PURE || state == 0) {
         vnode->SetPrior(0, 0, true); //所有动作初始化为 (0, 0)
@@ -99,8 +97,8 @@ void SIMULATOR::Prior(const STATE* state, const HISTORY& history,
     }
 
     if (Knowledge.TreeLevel >= KNOWLEDGE::LEGAL) {
-    	actions.clear();
-    	GenerateLegal(*state, /*history,*/ actions, status);
+        actions.clear();
+        GenerateLegal(*state, /*history,*/ actions, status);
 
         for (vector<int>::const_iterator i_action = actions.begin(); i_action != actions.end(); ++i_action) {
             int a = *i_action;
@@ -108,7 +106,7 @@ void SIMULATOR::Prior(const STATE* state, const HISTORY& history,
             qnode.SetPrior(0, 0, true);
         }
     }
-    
+
     if (Knowledge.TreeLevel >= KNOWLEDGE::SMART) {
         actions.clear();
         GeneratePreferred(*state, history, actions, status); //产生优先动作
@@ -117,7 +115,7 @@ void SIMULATOR::Prior(const STATE* state, const HISTORY& history,
             int a = *i_action;
             QNODE& qnode = vnode->Child(a);
             qnode.SetPrior(Knowledge.SmartTreeCount, Knowledge.SmartTreeValue, true);
-        }    
+        }
     }
 }
 
@@ -130,7 +128,7 @@ void SIMULATOR::DisplayState(const STATE& , ostream& ) const
 {
 }
 
-void SIMULATOR::DisplayAction(int action, ostream& ostr) const 
+void SIMULATOR::DisplayAction(int action, ostream& ostr) const
 {
     ostr << "Action " << action << endl;
 }
@@ -145,8 +143,8 @@ void SIMULATOR::DisplayReward(double reward, std::ostream& ostr) const
     ostr << "Reward " << reward << endl;
 }
 
-double SIMULATOR::GetHorizon(double accuracy, int undiscountedHorizon) const 
-{ 
+double SIMULATOR::GetHorizon(double accuracy, int undiscountedHorizon) const
+{
     if (Discount == 1)
         return undiscountedHorizon;
     return log(accuracy) / log(Discount);
