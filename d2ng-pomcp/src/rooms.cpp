@@ -117,8 +117,7 @@ bool ROOMS::Step(STATE& state, int action,
     return false; //not terminated
 }
 
-bool ROOMS::LocalMove(STATE& state, const HISTORY& history,
-    int stepObs, const STATUS& ) const //局部扰动
+bool ROOMS::LocalMove(STATE& state, const HISTORY& history, int, const STATUS& ) const //局部扰动
 {
     ROOMS_STATE rooms_state = safe_cast<ROOMS_STATE&>(state);
     if (GetObservation(rooms_state) == history.Back().Observation) {
