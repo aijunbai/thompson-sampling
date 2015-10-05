@@ -40,7 +40,6 @@ public:
         
         int NumRuns; //XXX
         int NumSteps; //XXX
-//        int SimSteps; //XXX
         double TimeOut;
         int MinDoubles, MaxDoubles;
         int TransformDoubles;

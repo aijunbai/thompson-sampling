@@ -8,8 +8,10 @@ DEPENDPATH += . src
 INCLUDEPATH += . src
 LIBS += -lboost_program_options
 
-CONFIG -= qt debug
 INCLUDEPATH -= qt
+CONFIG -= qt
+CONFIG -= debug
+CONFIG += release
 
 # Input
 HEADERS += src/battleship.h \
@@ -30,7 +32,8 @@ HEADERS += src/battleship.h \
            src/testsimulator.h \
            src/utils.h \
            src/distribution.h \
-    src/rooms.h
+           src/rooms.h
+
 SOURCES += src/battleship.cpp \
            src/beliefstate.cpp \
            src/coord.cpp \
@@ -46,4 +49,4 @@ SOURCES += src/battleship.cpp \
            src/testsimulator.cpp \
            src/utils.cpp \
            src/distribution.cpp \
-    src/rooms.cpp
+           src/rooms.cpp

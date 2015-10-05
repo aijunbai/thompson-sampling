@@ -6,13 +6,12 @@ using namespace std;
 EXPERIMENT::PARAMS::PARAMS()
 :   NumRuns(1000),
     NumSteps(100000),
-//    SimSteps(1000),
     TimeOut(3600),
     MinDoubles(0),
     MaxDoubles(20),
     TransformDoubles(-4),
     TransformAttempts(1000),
-    Accuracy(0.01),
+    Accuracy(0.001),
     UndiscountedHorizon(1000)
 {
 }
@@ -56,10 +55,9 @@ void EXPERIMENT::Run()
 
         boost::timer timer_per_action;
         int action = mcts.SelectAction(); //XXX 用 Monte Carlo 方法选择一个动作
+
         Results.TimePerAction.Add(timer_per_action.elapsed());
-
         terminal = Real.Step(*state, action, observation, reward); //根据 state 和 action 转移到下一个状态，获得实际观察和回报
-
         Results.Reward.Add(reward);
         undiscountedReturn += reward;
         discountedReturn += reward * discount;
@@ -67,8 +65,8 @@ void EXPERIMENT::Run()
 
         if (SearchParams.Verbose >= 1)
         {
-        	cout << "\nStep " << t << endl;
-            cout << "#" << action << " ";
+              cout << "\nStep " << t << " of " << ExpParams.NumSteps << endl;
+            cout << "Action: #" << action << " ";
             Real.DisplayAction(action, cout);
             Real.DisplayState(*state, cout);
             Real.DisplayObservation(*state, observation, cout);
@@ -136,10 +134,11 @@ void EXPERIMENT::Run()
     Results.UndiscountedReturn.Add(undiscountedReturn);
     Results.DiscountedReturn.Add(discountedReturn);
 
+    cout << "\n#End of experiment:" << endl;
     cout << "#Discounted return = " << discountedReturn
-    		<< ", average = " << Results.DiscountedReturn.GetMean() << endl;
+            << ", average = " << Results.DiscountedReturn.GetMean() << endl;
     cout << "#Undiscounted return = " << undiscountedReturn
-    		<< ", average = " << Results.UndiscountedReturn.GetMean() << endl;
+            << ", average = " << Results.UndiscountedReturn.GetMean() << endl;
 
     BELIEF_STATE::SAMPLES_STAT.Print("#Belief size", cout);
     VNODE::PARTICLES_STAT.Print("#Particle size", cout);
@@ -171,7 +170,6 @@ void EXPERIMENT::DiscountedReturn()
     OutputFile << "#Simulations\tRuns\tUndiscounted return\tUndiscounted error\tDiscounted return\tDiscounted error\tTime\tTimePerAction\n";
 
     SearchParams.MaxDepth = Simulator.GetHorizon(ExpParams.Accuracy, ExpParams.UndiscountedHorizon); //搜索过程中的最大深度
-//    ExpParams.SimSteps = Simulator.GetHorizon(ExpParams.Accuracy, ExpParams.UndiscountedHorizon);
     ExpParams.NumSteps = Real.GetHorizon(ExpParams.Accuracy, ExpParams.UndiscountedHorizon); //实验的最大步长
 
     for (int i = ExpParams.MinDoubles; i <= ExpParams.MaxDoubles; i++)
@@ -179,7 +177,7 @@ void EXPERIMENT::DiscountedReturn()
         SearchParams.NumSimulations = 1 << i; //迭代次数 iterations
 
         if (SearchParams.TimeOutPerAction < 0.0) { //非anytime模式
-        	SearchParams.NumStartStates = 1 << i; //初始粒子数
+            SearchParams.NumStartStates = 1 << i; //初始粒子数
         }
 
         if (i + ExpParams.TransformDoubles >= 0)
@@ -212,38 +210,3 @@ void EXPERIMENT::DiscountedReturn()
     }
 }
 
-//void EXPERIMENT::AverageReward()
-//{
-//    cout << "Main runs" << endl;
-//    OutputFile << "Simulations\tSteps\tAverage reward\tAverage time\n";
-//
-//    SearchParams.MaxDepth = Simulator.GetHorizon(ExpParams.Accuracy, ExpParams.UndiscountedHorizon);
-////    ExpParams.SimSteps = Simulator.GetHorizon(ExpParams.Accuracy, ExpParams.UndiscountedHorizon);
-//
-//    for (int i = ExpParams.MinDoubles; i <= ExpParams.MaxDoubles; i++)
-//    {
-//        SearchParams.NumSimulations = 1 << i;
-//        SearchParams.NumStartStates = 1 << i;
-//        if (i + ExpParams.TransformDoubles >= 0)
-//            SearchParams.NumTransforms = 1 << (i + ExpParams.TransformDoubles);
-//        else
-//            SearchParams.NumTransforms = 1;
-//        SearchParams.MaxAttempts = SearchParams.NumTransforms * ExpParams.TransformAttempts;
-//
-//        Results.Clear();
-//        Run();
-//
-//        cout << "Simulations = " << SearchParams.NumSimulations << endl
-//            << "Steps = " << Results.Reward.GetCount() << endl
-//            << "Average reward = " << Results.Reward.GetMean()
-//            << " +- " << Results.Reward.GetStdErr() << endl
-//            << "Average time = " << Results.Time.GetMean() / Results.Reward.GetCount() << endl;
-//        OutputFile << SearchParams.NumSimulations << "\t"
-//            << Results.Reward.GetCount() << "\t"
-//            << Results.Reward.GetMean() << "\t"
-//            << Results.Reward.GetStdErr() << "\t"
-//            << Results.Time.GetMean() / Results.Reward.GetCount() << endl;
-//    }
-//}
-
-//----------------------------------------------------------------------------

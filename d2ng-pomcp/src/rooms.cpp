@@ -1,8 +1,9 @@
 #include "rooms.h"
 #include "utils.h"
 #include "distribution.h"
-#include <bitset>
 #include <fstream>
+#include <vector>
+#include <algorithm>
 #include <boost/unordered_map.hpp>
 
 using namespace std;
@@ -16,7 +17,6 @@ ROOMS::ROOMS(const char *map_name, bool state_abstraction):
 
     NumActions = 4; //动作数
     NumObservations = mStateAbstraction? mRooms: mGrid->GetXSize() * mGrid->GetYSize();
-    RewardRange = 1.0;
     Discount = 0.9;
 }
 
@@ -98,7 +98,6 @@ bool ROOMS::Step(STATE& state, int action,
 
     ROOMS_STATE& rooms_state = safe_cast<ROOMS_STATE&>(state);
     reward = 0.0;
-    observation = GetObservation(rooms_state);
 
     if (SimpleRNG::ins().Bernoulli(4.0/9.0)) { //fail
         action = SimpleRNG::ins().Random(NumActions);
@@ -108,6 +107,7 @@ bool ROOMS::Step(STATE& state, int action,
     if (mGrid->operator ()(pos) != 'x') { //not wall
         rooms_state.AgentPos = pos;
     }
+    observation = GetObservation(rooms_state);
 
     if (rooms_state.AgentPos == mGoalPos) {
         reward = 1.0;
@@ -120,6 +120,10 @@ bool ROOMS::Step(STATE& state, int action,
 bool ROOMS::LocalMove(STATE& state, const HISTORY& history,
     int stepObs, const STATUS& ) const //局部扰动
 {
+    ROOMS_STATE rooms_state = safe_cast<ROOMS_STATE&>(state);
+    if (GetObservation(rooms_state) == history.Back().Observation) {
+        return true;
+    }
     return false;
 }
 
@@ -159,11 +163,17 @@ void ROOMS::DisplayBeliefs(const BELIEF_STATE& belief,
         m[state.AgentPos] += 1;
     }
 
-    ostr << "#Belief: ";
+    vector<pair<double, const COORD*> > sorted;
     for (boost::unordered_map<COORD, int>::iterator it = m.begin(); it != m.end(); ++it) {
-        ostr << "#" << it->first << " (" << double(it->second) / double(belief.GetNumSamples()) << ") ";
+        double p = double(it->second) / double(belief.GetNumSamples());
+        sorted.push_back(make_pair(p, &(it->first)));
     }
+    sort(sorted.begin(), sorted.end(), greater<pair<double, const COORD*> >());
 
+    ostr << "#Belief: ";
+    for (uint i = 0; i < sorted.size(); ++i) {
+        ostr << "#" << *(sorted[i].second) << " (" << sorted[i].first << ") ";
+    }
     ostr << std::endl;
 }
 
@@ -198,7 +208,10 @@ void ROOMS::DisplayState(const STATE& state, std::ostream& ostr) const
 
 void ROOMS::DisplayObservation(const STATE& , int observation, std::ostream& ostr) const
 {
-    ostr << observation << endl;
+  if (mStateAbstraction)
+    ostr << "Observation: " << "Room" << observation << endl;
+  else
+    ostr << "Observation: " << "Coord" << mGrid->Coord(observation) << endl;
 }
 
 void ROOMS::DisplayAction(int action, std::ostream& ostr) const

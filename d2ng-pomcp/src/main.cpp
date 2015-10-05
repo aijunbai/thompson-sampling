@@ -161,8 +161,9 @@ int main(int argc, char* argv[])
     }
     else if (problem == "rooms")
     {
-        real = new ROOMS("rooms.map");
-        simulator = new ROOMS("rooms.map");
+        bool state_abstration = true;
+        real = new ROOMS("rooms.map", state_abstration);
+        simulator = new ROOMS("rooms.map", state_abstration);
     }
     else
     {

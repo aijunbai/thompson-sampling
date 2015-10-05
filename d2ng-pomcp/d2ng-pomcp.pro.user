@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 3.5.0, 2015-10-03T20:22:18. -->
+<!-- Written by QtCreator 3.5.0, 2015-10-04T14:00:35. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -185,7 +185,7 @@
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">d2ng-pomcp</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/baj/Dropbox/Workspace/github/thompson-sampling/d2ng-pomcp/d2ng-pomcp.pro</value>
-    <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments"></value>
+    <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments">--outputfile output-22477.txt --problem rooms --size 7 --number 8 --verbose 2 --reusedepth 2 --reusetree 0 --useparticlefilter 0 --treeknowledge 1 --rolloutknowledge 2 --mindoubles 12 --maxdoubles 12 --runs 1 --seeding 0 --timeout 3600 --timeoutperaction -1 </value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">d2ng-pomcp.pro</value>
     <value type="bool" key="Qt4ProjectManager.Qt4RunConfiguration.UseDyldImageSuffix">false</value>
     <value type="bool" key="Qt4ProjectManager.Qt4RunConfiguration.UseTerminal">false</value>
