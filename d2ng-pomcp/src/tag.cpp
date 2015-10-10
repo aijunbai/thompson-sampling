@@ -12,6 +12,7 @@ TAG::TAG(int opponents)
     NumActions = 5;
     NumObservations = NumCells + 1;
     Discount = 0.95;
+    mName << "tag_" << opponents;
 }
 
 STATE* TAG::Copy(const STATE& state) const

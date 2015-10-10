@@ -48,8 +48,7 @@ void EXPERIMENT::Run()
     if (SearchParams.Verbose >= 1)
         Real.DisplayState(*state, cout);
 
-    for (t = 0; t < ExpParams.NumSteps; t++)
-    {
+    for (t = 0; t < ExpParams.NumSteps; t++) {
         int observation;
         double reward;
 
@@ -63,9 +62,8 @@ void EXPERIMENT::Run()
         discountedReturn += reward * discount;
         discount *= Real.GetDiscount();
 
-        if (SearchParams.Verbose >= 1)
-        {
-              cout << "\nStep " << t << " of " << ExpParams.NumSteps << endl;
+        if (SearchParams.Verbose >= 1) {
+            cout << "\nStep " << t << " of " << ExpParams.NumSteps << endl;
             cout << "Action: #" << action << " ";
             Real.DisplayAction(action, cout);
             Real.DisplayState(*state, cout);
@@ -73,17 +71,25 @@ void EXPERIMENT::Run()
             Real.DisplayReward(reward, cout);
         }
 
-        if (terminal)
-        {
+        if (terminal) {
             cout << "Terminated" << endl;
             break;
         }
-        outOfParticles = !mcts.Update(action, observation, reward); //XXX 更新历史信息，得到新的 Root 节点，设置好初始信念状态
-        if (outOfParticles)
-            break; //Out of particles, finishing episode with SelectRandom
 
-        if (timer.elapsed() > ExpParams.TimeOut)
-        {
+        if (Real.Name().find("rooms_") == 0) { // test state abstraction method
+            if (!mcts.Update(action, observation, *state)) {
+                assert(0);
+            }
+        }
+        else {
+            outOfParticles = !mcts.Update(action, observation); //更新历史信息，得到新的 Root 节点，设置好初始信念状态
+
+            if (outOfParticles) {
+                break; //Out of particles, finishing episode with SelectRandom
+            }
+        }
+
+        if (timer.elapsed() > ExpParams.TimeOut) {
             cout << "Timed out after " << t << " steps in "
                 << Results.Time.GetTotal() << "seconds" << endl;
             break;

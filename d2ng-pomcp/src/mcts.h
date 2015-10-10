@@ -32,7 +32,8 @@ public:
     ~MCTS();
 
     int SelectAction();
-    bool Update(int action, int observation, double reward);
+    bool Update(int action, int observation); // update history
+    bool Update(int action, int observation, STATE &state);  // update history and ground state
 
     void Search();
     void SearchImp();

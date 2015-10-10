@@ -4,8 +4,10 @@
 #include "history.h"
 #include "node.h"
 #include "utils.h"
+#include <string>
 #include <iostream>
 #include <math.h>
+#include <sstream>
 
 class BELIEF_STATE;
 class VNODE;
@@ -124,6 +126,11 @@ public:
     virtual void DisplayObservation(const STATE& state, int observation, std::ostream& ostr) const;
     virtual void DisplayReward(double reward, std::ostream& ostr) const;
 
+    // Problem name
+    std::string Name() const {
+        return mName.str();
+    }
+
     // Accessors
     void SetKnowledge(const KNOWLEDGE& knowledge) { Knowledge = knowledge; }
     int GetNumActions() const { return NumActions; }
@@ -133,10 +140,10 @@ public:
     double GetHorizon(double accuracy, int undiscountedHorizon = 100) const; //XXX 这是怎么算的？
 
 protected:
-
     int NumActions, NumObservations;
     double Discount;
     KNOWLEDGE Knowledge;
+    std::stringstream mName;
 };
 
 #endif // SIMULATOR_H

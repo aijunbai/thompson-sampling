@@ -74,7 +74,20 @@ MCTS::~MCTS()
     assert(vnode::GetNumAllocated() == 0);
 }
 
-bool MCTS::Update(int action, int observation, double /*reward*/)
+bool MCTS::Update(int action, int observation, STATE &state)
+{
+    History.Add(action, observation); //更新历史
+    VNODE::Free(Root, Simulator);
+    Root = ExpandNode(&state);
+    AddSample(Root, state);
+
+    if (Params.Verbose >= 1)
+        Simulator.DisplayBeliefs(Root->Beliefs(), cout);
+
+    return true;
+}
+
+bool MCTS::Update(int action, int observation)
 {
     History.Add(action, observation); //更新历史
     BELIEF_STATE beliefs;
@@ -120,9 +133,9 @@ bool MCTS::Update(int action, int observation, double /*reward*/)
     // Find a state to initialise prior (only requires fully observed state)
     const STATE* state = 0;
     if (vnode && !vnode->Beliefs().Empty())
-        state = vnode->Beliefs().GetSample(0); //得到一个*可能*的状态，主要目的是用来初始化先验信息 XXX
+        state = vnode->Beliefs().GetSample(); //得到一个*可能*的状态，主要目的是用来初始化先验信息 XXX
     else
-        state = beliefs.GetSample(0);
+        state = beliefs.GetSample();
 
     if (vnode && Params.ReuseTree) {
         int size1 = vnode::GetNumAllocated();
@@ -352,6 +365,7 @@ void MCTS::AddSample(VNODE* node, const STATE& state)
 {
     STATE* sample = Simulator.Copy(state);
     node->Beliefs().AddSample(sample);
+
 //    if (Params.Verbose >= 2)
 //    {
 //        cout << "Adding sample:" << endl;

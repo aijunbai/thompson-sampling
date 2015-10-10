@@ -14,6 +14,7 @@ ROCKSAMPLE::ROCKSAMPLE(int size, int rocks)
     NumActions = NumRocks + 5; //动作数
     NumObservations = 3; //观察数
     Discount = 0.95;
+    mName << "rocksample_" << size << "_" << rocks;
 
     HalfEfficiencyDistance = 20;
     StartPos = COORD(0, Size / 2);
@@ -503,6 +504,8 @@ FieldVisionRockSample::FieldVisionRockSample(int size, int rocks): ROCKSAMPLE(si
 {
     NumActions = 5; //动作数
     NumObservations = 1 << rocks; //观察数
+    mName.clear();
+    mName << "fieldvisionrocksample_" << size << "_" << rocks;
 }
 
 bool FieldVisionRockSample::Step(STATE& state, int action,

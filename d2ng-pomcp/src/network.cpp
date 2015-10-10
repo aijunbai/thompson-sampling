@@ -14,6 +14,7 @@ NETWORK::NETWORK(int numMachines, int ntype)
     NumActions = NumMachines * 2 + 1;
     NumObservations = 3;
     Discount = 0.95;
+    mName << "network_" << NumMachines << "_" << ntype;
 
     switch (ntype)
     {

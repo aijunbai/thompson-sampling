@@ -18,6 +18,7 @@ ROOMS::ROOMS(const char *map_name, bool state_abstraction):
     NumActions = 4; //动作数
     NumObservations = mStateAbstraction? mRooms: mGrid->GetXSize() * mGrid->GetYSize();
     Discount = 0.9;
+    mName << "rooms_" << map_name << "_" << state_abstraction;
 }
 
 ROOMS::~ROOMS()
@@ -97,7 +98,7 @@ bool ROOMS::Step(STATE& state, int action,
     assert(action < NumActions);
 
     ROOMS_STATE& rooms_state = safe_cast<ROOMS_STATE&>(state);
-    reward = 0.0;
+    reward = -1.0;
 
     if (SimpleRNG::ins().Bernoulli(4.0/9.0)) { //fail
         action = SimpleRNG::ins().Random(NumActions);
@@ -110,7 +111,6 @@ bool ROOMS::Step(STATE& state, int action,
     observation = GetObservation(rooms_state);
 
     if (rooms_state.AgentPos == mGoalPos) {
-        reward = 1.0;
         return true;
     }
 
@@ -143,7 +143,38 @@ void ROOMS::GenerateLegal(const STATE& state, /*const HISTORY& ,*/
 void ROOMS::GeneratePreferred(const STATE& state, const HISTORY&, //手工策略
     vector<int>& actions, const STATUS& status) const //获得优先动作
 {
-    GenerateLegal(state, actions, status);
+    if (mStateAbstraction) {
+        const ROOMS_STATE& rooms_state =
+                safe_cast<const ROOMS_STATE&>(state);
+
+        if (mGrid->operator ()(rooms_state.AgentPos) == mGrid->operator ()(mGoalPos)) {
+            int x = mGoalPos.X - rooms_state.AgentPos.X;
+            int y = mGoalPos.Y - rooms_state.AgentPos.Y;
+
+            double dist = 1.0e6;
+            int besta = -1;
+            for (int i = 0; i < NumActions; ++i) {
+                double d = (coord::Compass[i].X - x) * (coord::Compass[i].X - x) +
+                         (coord::Compass[i].Y - y) * (coord::Compass[i].Y - y);
+                if (d < dist) {
+                    dist = d;
+                    besta = i;
+                }
+            }
+            if (besta != -1) {
+                actions.push_back(besta);
+            }
+            else {
+                GenerateLegal(state, actions, status);
+            }
+        }
+        else {
+            GenerateLegal(state, actions, status);
+        }
+    }
+    else {
+        GenerateLegal(state, actions, status);
+    }
 }
 
 int ROOMS::GetObservation(const ROOMS_STATE& rooms_state) const

@@ -184,6 +184,8 @@ int main(int argc, char* argv[])
 
     simulator->SetKnowledge(knowledge);
     EXPERIMENT experiment(*real, *simulator, outputfile, expParams, searchParams);
+
+    cout << "Running experiment for problem " << simulator->Name() << "..." << endl;
     experiment.DiscountedReturn();
 
     delete real;

@@ -37,6 +37,7 @@ POCMAN::POCMAN(int xsize, int ysize)
         // Hear ghost
 
     Discount = 0.95;
+    mName << "pocman_" << xsize << "_" << ysize;
 }
 
 MICRO_POCMAN::MICRO_POCMAN()
